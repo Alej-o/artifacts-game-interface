@@ -26,6 +26,7 @@ export const useMap = defineStore('map', () => {
       })
       const json = await res.json()
       currentMap.value = json.data
+      console.log('[currentMap updated]', json.data)
     } catch (error) {
       console.error('[Erreur fetchCurrentMap]', error)
     }

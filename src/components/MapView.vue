@@ -19,8 +19,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, computed, watchEffect } from 'vue'
 import { usePlayer } from '../stores/usePlayer'
+import { useMap } from '../stores/useMap'
+
+const { player, movePlayer } = usePlayer()
+const { fetchCurrentMap } = useMap()
+
+const mapContainer = ref<HTMLDivElement | null>(null)
+const isMoving = ref(false)
+const currentPlayer = computed(() => player ?? null)
+const mapGrid = ref<(MapTile | null)[][]>([])
+
+let minX = 0
+let minY = 0
 
 interface MapTile {
   name: string
@@ -29,17 +41,6 @@ interface MapTile {
   y: number
   content: any
 }
-
-const { player, movePlayer } = usePlayer()
-const mapContainer = ref<HTMLDivElement | null>(null)
-const isMoving = ref(false)
-
-const currentPlayer = computed(() => {
-  return player ?? null
-})
-
-const token = import.meta.env.VITE_ARTIFACT_TOKEN
-const mapGrid = ref<(MapTile | null)[][]>([])
 
 function getSkinUrl(skin: string): string {
   return `https://www.artifactsmmo.com/images/maps/${skin}.png`
@@ -60,7 +61,7 @@ async function fetchAllMaps(): Promise<MapTile[]> {
       `https://api.artifactsmmo.com/maps?page=${page}&size=${pageSize}`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${import.meta.env.VITE_ARTIFACT_TOKEN}`,
           Accept: 'application/json',
         },
       }
@@ -84,8 +85,8 @@ async function buildGrid() {
 
   const xValues = maps.map((m) => m.x)
   const yValues = maps.map((m) => m.y)
-  const minX = Math.min(...xValues)
-  const minY = Math.min(...yValues)
+  minX = Math.min(...xValues)
+  minY = Math.min(...yValues)
 
   const width = Math.max(...xValues) - minX + 1
   const height = Math.max(...yValues) - minY + 1
@@ -101,18 +102,67 @@ async function buildGrid() {
   }
 
   mapGrid.value = grid
-
   await nextTick()
+  centerCameraOnPlayer()
+}
 
+function centerCameraOnPlayer() {
   const playerData = currentPlayer.value
-  if (mapContainer.value && playerData) {
-    const scrollX = (playerData.x - minX) * 224 - mapContainer.value.clientWidth / 4 + 112
-    const scrollY = (playerData.y - minY) * 224 - mapContainer.value.clientHeight / 4 + 112
+  const container = mapContainer.value
+  if (!playerData || !container || !mapGrid.value.length) return
 
-    mapContainer.value.scrollTo({
-      top: scrollY,
-      left: scrollX,
-      behavior: 'instant',
+  const tileSize = 224
+  const playerScreenX = (playerData.x - minX) * tileSize
+  const playerScreenY = (playerData.y - minY) * tileSize
+
+  container.scrollTo({
+    top: playerScreenY - container.clientHeight / 2 + tileSize / 2,
+    left: playerScreenX - container.clientWidth / 2 + tileSize / 2,
+    behavior: 'instant',
+  })
+}
+
+function maybeScrollIfNearEdge() {
+  const playerData = currentPlayer.value
+  const container = mapContainer.value
+  if (!playerData || !container) return
+
+  const tileSize = 224
+  const visibleWidth = container.clientWidth
+  const visibleHeight = container.clientHeight
+
+  const playerScreenX = (playerData.x - minX) * tileSize
+  const playerScreenY = (playerData.y - minY) * tileSize
+
+  const scrollLeft = container.scrollLeft
+  const scrollTop = container.scrollTop
+
+  const margin = 150
+
+  const leftEdge = scrollLeft + margin
+  const rightEdge = scrollLeft + visibleWidth - margin
+  const topEdge = scrollTop + margin
+  const bottomEdge = scrollTop + visibleHeight - margin
+
+  let shouldScroll = false
+  let newScrollX = scrollLeft
+  let newScrollY = scrollTop
+
+  if (playerScreenX < leftEdge || playerScreenX > rightEdge) {
+    shouldScroll = true
+    newScrollX = playerScreenX - visibleWidth / 2 + tileSize / 2
+  }
+
+  if (playerScreenY < topEdge || playerScreenY > bottomEdge) {
+    shouldScroll = true
+    newScrollY = playerScreenY - visibleHeight / 2 + tileSize / 2
+  }
+
+  if (shouldScroll) {
+    container.scrollTo({
+      top: newScrollY,
+      left: newScrollX,
+      behavior: 'smooth',
     })
   }
 }
@@ -124,17 +174,40 @@ async function handleKeyPress(event: KeyboardEvent) {
   let newY = currentPlayer.value.y
 
   switch (event.key) {
-    case 'ArrowUp': newY -= 1; break
-    case 'ArrowDown': newY += 1; break
-    case 'ArrowLeft': newX -= 1; break
-    case 'ArrowRight': newX += 1; break
-    default: return
+    case 'ArrowUp':
+    case 'z':
+      newY -= 1
+      break
+    case 'ArrowDown':
+    case 's':
+      newY += 1
+      break
+    case 'ArrowLeft':
+    case 'q':
+      newX -= 1
+      break
+    case 'ArrowRight':
+    case 'd':
+      newX += 1
+      break
+    default:
+      return
   }
 
   isMoving.value = true
   const cooldown = await movePlayer(newX, newY)
-  setTimeout(() => { isMoving.value = false }, (cooldown ?? 5) * 1000)
+  maybeScrollIfNearEdge()
+  setTimeout(() => {
+    isMoving.value = false
+  }, (cooldown ?? 5) * 1000)
 }
+
+
+watchEffect(() => {
+  if (currentPlayer.value) {
+    fetchCurrentMap(currentPlayer.value.x, currentPlayer.value.y)
+  }
+})
 
 onMounted(() => {
   buildGrid()
@@ -151,6 +224,9 @@ onUnmounted(() => {
 })
 </script>
 
+
+
+
 <style scoped>
 .map-container {
   width: 100vw;
@@ -163,14 +239,12 @@ onUnmounted(() => {
 .all-maps-grid {
   display: flex;
   flex-direction: column;
-  gap: 1px;
   width: max-content;
   height: max-content;
 }
 
 .row {
   display: flex;
-  gap: 1px;
 }
 
 .tile {

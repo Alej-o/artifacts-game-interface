@@ -1,18 +1,22 @@
 <template>
-  <div class="coordination" v-if="currentMap">
-    <p>{{ currentMap.name }}</p>
-    <p>({{ currentMap.x }}, {{ currentMap.y }})</p>
+  <div class="coordination" v-if="map">
+    <p>{{ map.name }}</p>
+    <p>({{ map.x }}, {{ map.y }})</p>
     <p>
-      <span v-if="currentMap.content?.code">{{ currentMap.content.code }}</span>
-      <span v-else></span>
+      <span v-if="map.content?.code">{{ map.content.code }}</span>
     </p>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useMap } from '../stores/useMap'
 
-const { currentMap } = useMap()
+
+const store = useMap()
+
+
+const map = computed(() => store.currentMap)
 </script>
 
 <style scoped>
