@@ -16,3 +16,5 @@ onMounted(() => {
   store.fetchPlayer()
 })
 </script>
+
+

@@ -1,26 +1,28 @@
 <template>
-  <div class="all-maps-grid">
-    <div v-for="(row, yIndex) in mapGrid" :key="yIndex" class="row">
-      <div v-for="(tile, xIndex) in row" :key="xIndex" class="tile">
-        <img v-if="tile" :src="getSkinUrl(tile.skin)" :alt="tile.name" />
-       <div v-if="tile && player && tile.x === player.x && tile.y === player.y" class="player-wrapper">
-  <p class="player-name">{{ player.name }}</p>
-  <img
-    :src="getPlayerSkinUrl(player.skin)"
-    alt="Player"
-    class="player"
-  />
-</div>
+  <div ref="mapContainer" class="map-container">
+    <div class="all-maps-grid">
+      <div v-for="(row, yIndex) in mapGrid" :key="yIndex" class="row">
+        <div v-for="(tile, xIndex) in row" :key="xIndex" class="tile">
+          <img v-if="tile" :src="getSkinUrl(tile.skin)" :alt="tile.name" />
+          <div
+            v-if="tile && player && tile.x === player.x && tile.y === player.y"
+            class="player-wrapper"
+          >
+            <p class="player-name">{{ player.name }}</p>
+            <img :src="getPlayerSkinUrl(player.skin)" alt="Player" class="player" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { usePlayer } from '../stores/usePlayer'
 
 const { player } = usePlayer()
+const mapContainer = ref<HTMLDivElement | null>(null)
 
 interface MapTile {
   name: string
@@ -72,12 +74,10 @@ async function buildGrid() {
   const xValues = maps.map((m) => m.x)
   const yValues = maps.map((m) => m.y)
   const minX = Math.min(...xValues)
-  const maxX = Math.max(...xValues)
   const minY = Math.min(...yValues)
-  const maxY = Math.max(...yValues)
 
-  const width = maxX - minX + 1
-  const height = maxY - minY + 1
+  const width = Math.max(...xValues) - minX + 1
+  const height = Math.max(...yValues) - minY + 1
 
   const grid: (MapTile | null)[][] = Array.from({ length: height }, () =>
     Array(width).fill(null)
@@ -90,24 +90,49 @@ async function buildGrid() {
   }
 
   mapGrid.value = grid
+
+  await nextTick()
+
+  if (mapContainer.value && player) {
+    const scrollX = (player.x - minX) * 224 - mapContainer.value.clientWidth / 4 + 112
+    const scrollY = (player.y - minY) * 224 - mapContainer.value.clientHeight / 4 + 112
+
+    mapContainer.value.scrollTo({
+      top: scrollY,
+      left: scrollX,
+      behavior: 'instant', 
+    })
+  }
 }
 
 onMounted(() => {
   buildGrid()
-  
 })
 </script>
 
 <style scoped>
+
+.map-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  
+}
+
 .all-maps-grid {
   display: flex;
   flex-direction: column;
   gap: 1px;
+  width: max-content;
+  height: max-content;
 }
+
 .row {
   display: flex;
   gap: 1px;
 }
+
 .tile {
   width: 224px;
   height: 224px;
@@ -116,21 +141,25 @@ onMounted(() => {
   justify-content: center;
   position: relative;
 }
+
 .tile img {
   object-fit: cover;
 }
-.player {
-  width: 50%;
-  height: auto;
-}
+
 .player-wrapper {
   position: absolute;
-  bottom: 0; 
+  bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
   text-align: center;
 }
+
+.player {
+  width: 50%;
+  height: auto;
+}
+
 .player-name {
   font-size: 14px;
   color: white;
@@ -139,5 +168,4 @@ onMounted(() => {
   border-radius: 4px;
   margin-bottom: 2px;
 }
-
 </style>
