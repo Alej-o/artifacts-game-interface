@@ -1,16 +1,18 @@
 <template>
   <div class="coordination" v-if="currentMap">
-    <p> {{ currentMap.name }}</p>
+    <p>{{ currentMap.name }}</p>
     <p>({{ currentMap.x }}, {{ currentMap.y }})</p>
+    <p>
       <span v-if="currentMap.content?.code">{{ currentMap.content.code }}</span>
       <span v-else></span>
+    </p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { usePlayer } from '../stores/usePlayer'
+import { useMap } from '../stores/useMap'
 
-const { currentMapName: currentMap } = usePlayer()
+const { currentMap } = useMap()
 </script>
 
 <style scoped>
@@ -20,12 +22,12 @@ const { currentMapName: currentMap } = usePlayer()
   left: 25px;
   font-weight: bold;
   font-size: 20px;
-  color: #ffffff;
+  color: #fcfcfc;
   font-family: sans-serif;
   z-index: 999;
   display: flex;
-  align-items: center;
+  flex-direction: row;
+  align-items: flex-start;
   gap: 5px;
-
 }
 </style>

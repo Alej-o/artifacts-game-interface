@@ -1,19 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
-
-
-interface MapContent {
-  type: string
-  code: string
-}
-
-interface MapData {
-  name: string
-  skin: string
-  x: number
-  y: number
-  content: MapContent | null
-}
+import { ref } from 'vue'
+import { useMap } from './useMap'
 
 export const usePlayer = defineStore('player', () => {
   const player = ref<null | {
@@ -23,8 +10,6 @@ export const usePlayer = defineStore('player', () => {
     x: number
     y: number
   }>(null)
-
-const currentMapName = ref<MapData | null>(null)
 
   const token = import.meta.env.VITE_ARTIFACT_TOKEN
 
@@ -47,8 +32,9 @@ const currentMapName = ref<MapData | null>(null)
           y: char.y ?? 0,
         }
 
+        const mapStore = useMap()
         if (player.value) {
-          await fetchCurrentMapName(player.value.x, player.value.y)
+          mapStore.fetchCurrentMap(player.value.x, player.value.y)
         }
       }
     } catch (error) {
@@ -56,30 +42,49 @@ const currentMapName = ref<MapData | null>(null)
     }
   }
 
-  async function fetchCurrentMapName(x: number, y: number) {
+  async function movePlayer(newX: number, newY: number): Promise<number | null> {
+    if (!player.value) return null
+
     try {
-      const res = await fetch(`https://api.artifactsmmo.com/maps/${x}/${y}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/json',
-        },
-      })
+      const res = await fetch(
+        `https://api.artifactsmmo.com/my/${player.value.name}/action/move`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ x: newX, y: newY }),
+        }
+      )
+
       const json = await res.json()
-      currentMapName.value = json.data
+      const movedChar = json.data?.character
+      const destination = json.data?.destination
+      const cooldown = json.data?.cooldown?.remaining_seconds ?? null
+
+      if (player.value && movedChar && destination) {
+        player.value.x = destination.x
+        player.value.y = destination.y
+        player.value.level = movedChar.level
+        player.value.skin = movedChar.skin
+        player.value.name = movedChar.name 
+      }
+
+      const mapStore = useMap()
+      mapStore.fetchCurrentMap(destination.x, destination.y)
+
+      return cooldown
     } catch (error) {
-      console.error('Failed to fetch map name:', error)
+      console.error('[Erreur movePlayer]', error)
+      return null
     }
   }
-
-  watch(player, (newPlayer) => {
-    if (newPlayer) {
-      fetchCurrentMapName(newPlayer.x, newPlayer.y)
-    }
-  })
 
   return {
     player,
     fetchPlayer,
-    currentMapName,
+    movePlayer,
   }
 })
