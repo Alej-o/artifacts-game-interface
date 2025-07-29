@@ -1,14 +1,19 @@
 <template>
   <main>
     <div v-if="!store.player">Chargement du joueur...</div>
-    <MapView v-else />
+    <template v-else>
+      <MapView />
+      <PlayerOverlay />
+    </template>
   </main>
 </template>
+
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { usePlayer } from './stores/usePlayer'
 import MapView from './components/MapView.vue'
+import PlayerOverlay from './components/PlayerOverlay.vue'
 
 const store = usePlayer()
 
