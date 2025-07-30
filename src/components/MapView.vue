@@ -3,7 +3,7 @@
     <div class="all-maps-grid">
       <div v-for="(row, yIndex) in mapGrid" :key="yIndex" class="row">
         <div v-for="(tile, xIndex) in row" :key="xIndex" class="tile">
-          <img v-if="tile" :src="getSkinUrl(tile.skin)" :alt="tile.name" />
+          <img v-if="tile" :src="getMapSkinUrl(tile.skin)" :alt="tile.name" />
           <div
             v-if="tile && currentPlayer && tile.x === currentPlayer.x && tile.y === currentPlayer.y"
             class="player-wrapper"
@@ -42,7 +42,7 @@ interface MapTile {
   content: any
 }
 
-function getSkinUrl(skin: string): string {
+function getMapSkinUrl(skin: string): string {
   return `https://www.artifactsmmo.com/images/maps/${skin}.png`
 }
 

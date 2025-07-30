@@ -9,6 +9,11 @@ export const usePlayer = defineStore('player', () => {
     skin: string
     x: number
     y: number
+    hp: number
+    max_hp: number
+    xp: number
+    max_xp: number
+    gold: number
   }>(null)
 
   const token = import.meta.env.VITE_ARTIFACT_TOKEN
@@ -30,6 +35,11 @@ export const usePlayer = defineStore('player', () => {
           ...char,
           x: char.x ?? 0,
           y: char.y ?? 0,
+          hp: char.hp,
+          max_hp: char.max_hp,
+          xp: char.xp,
+          max_xp: char.max_xp,
+          gold: char.gold
         }
 
         const mapStore = useMap()
