@@ -6,18 +6,24 @@
   </div>
 
   <div class="player-status" v-if="currentPlayer">
-    <div class="character">
-      <img :src="getPlayerSkinUrl(currentPlayer.skin)" alt="Player" class="player" />
-    </div>
+  <div class="status-container">
+     <div class="character-wrapper">
+  <p class="level-text">Lvl {{ player?.level }}</p>
+  <div class="character">
+    <p class="name-text">{{ player?.name }}</p>
+    <img :src="getPlayerSkinUrl(currentPlayer.skin)" alt="Player" class="player" />
+  </div>
+</div>
 
-    <div class="bars">
+    <div class="stats-section">
+
       <div class="hp-bar">
         <div class="hp-fill" :style="{ width: hpPercentage + '%' }"></div>
-        <p class="bar-text">{{ player?.hp }} / {{ player?.max_hp }}</p>
+        <p class="bar-text">{{ player?.hp }} / {{ player?.max_hp }} HP</p>
       </div>
       <div class="xp-bar">
         <div class="xp-fill" :style="{ width: xpPercentage + '%' }"></div>
-        <p class="bar-text">{{ player?.xp }} / {{ player?.max_xp }}</p>
+        <p class="bar-text">{{ player?.xp }} / {{ player?.max_xp }} XP</p>
       </div>
       <div class="gold-bar">
         <span class="icon">💰</span>
@@ -25,7 +31,10 @@
       </div>
     </div>
   </div>
+</div>
+
 </template>
+
 
 <script setup lang="ts">
 import { computed } from 'vue'
@@ -72,32 +81,69 @@ function getPlayerSkinUrl(skin: string): string {
   bottom: 20px;
   left: 26px;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
   z-index: 998;
+  transform: scale(1.3);
+  transform-origin: bottom left;
+}
+
+.status-container {
+  display: flex;
+  align-items: flex-end;
+}
+
+
+
+.name-text {
+  font-size: 15px;
+  font-weight: bold;
+  color: #fce8db;
+  width: 64px;
+  text-align: center;
+  font-family: sans-serif;
+  margin: 0 0 0px 0; 
+  z-index: 999;
 }
 
 .character {
   width: 64px;
   height: 64px;
+  overflow: hidden; 
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 6px;
+  justify-content: flex-start;
+  background-color: #3B7D4F;
+  border: 2px solid #2F5753;
+  border-radius: 4px;
+  padding: 2px;
+}
+.player {
+  width: 100%;
+  image-rendering: pixelated; 
 }
 
-.character .player {
-  width: 100%;
-  height: auto;
-  image-rendering: pixelated;
-  object-position: 0px 18px;
-    border: 2px solid #2F5753;
-  background-color: #3B7D4F;
-  border-radius: 4px;
-}
-.bars {
+
+
+.stats-section {
   display: flex;
-  flex-direction: column;  
-  gap: 0px;
+  flex-direction: column;
+  position: relative;
+}
+
+.character-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.level-text {
+  font-size: 15px;
+  font-weight: bold;
+  color: #ffffff;
+  font-family: sans-serif;
+  margin-bottom: 2px; 
+  margin-top: 0;
 }
 
 .hp-bar,
@@ -106,9 +152,9 @@ function getPlayerSkinUrl(skin: string): string {
   width: 220px;
   height: 15px;
   background-color: #3B7D4F;
-  border: 2px solid #2F5753;
-  border-top-right-radius: 2px;
-  border-bottom-right-radius: 2px;
+  border: 3px solid #2F5753;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -143,19 +189,20 @@ function getPlayerSkinUrl(skin: string): string {
   font-weight: bold;
   font-family: sans-serif;
 }
-.gold-bar{
-position: relative;
+
+.gold-bar {
   width: 110px;
   height: 22px;
   background-color: #3B7D4F;
-  border: 2px solid #2F5753;
-  border-top-right-radius: 2px;
-  border-bottom-right-radius: 2px;
+  border: 3px solid #2F5753;
+  border-bottom-right-radius: 3px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: left;
-  gap: 2px
+  gap: 4px;
+  padding-left: 4px;
 }
+
 
 </style>
