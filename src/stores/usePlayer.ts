@@ -31,21 +31,36 @@ export const usePlayer = defineStore('player', () => {
       const char = json.data?.[0]
 
       if (char) {
-        player.value = {
-          ...char,
-          x: char.x ?? 0,
-          y: char.y ?? 0,
-          hp: char.hp,
-          max_hp: char.max_hp,
-          xp: char.xp,
-          max_xp: char.max_xp,
-          gold: char.gold
+        if (!player.value) {
+          player.value = {
+            name: char.name,
+            level: char.level,
+            skin: char.skin,
+            x: char.x ?? 0,
+            y: char.y ?? 0,
+            hp: char.hp,
+            max_hp: char.max_hp,
+            xp: char.xp,
+            max_xp: char.max_xp,
+            gold: char.gold
+          }
+        } else {
+          Object.assign(player.value, {
+            name: char.name,
+            level: char.level,
+            skin: char.skin,
+            x: char.x ?? 0,
+            y: char.y ?? 0,
+            hp: char.hp,
+            max_hp: char.max_hp,
+            xp: char.xp,
+            max_xp: char.max_xp,
+            gold: char.gold
+          })
         }
 
         const mapStore = useMap()
-        if (player.value) {
-          mapStore.fetchCurrentMap(player.value.x, player.value.y)
-        }
+        mapStore.fetchCurrentMap(player.value.x, player.value.y)
       }
     } catch (error) {
       console.error('[Erreur fetchPlayer]', error)
@@ -75,11 +90,13 @@ export const usePlayer = defineStore('player', () => {
       const cooldown = json.data?.cooldown?.remaining_seconds ?? null
 
       if (player.value && movedChar && destination) {
-        player.value.x = destination.x
-        player.value.y = destination.y
-        player.value.level = movedChar.level
-        player.value.skin = movedChar.skin
-        player.value.name = movedChar.name 
+        Object.assign(player.value, {
+          x: destination.x,
+          y: destination.y,
+          level: movedChar.level,
+          skin: movedChar.skin,
+          name: movedChar.name
+        })
       }
 
       const mapStore = useMap()
@@ -92,9 +109,19 @@ export const usePlayer = defineStore('player', () => {
     }
   }
 
+  function updatePlayer(updated: typeof player.value) {
+    if (!updated) return
+    if (!player.value) {
+      player.value = updated
+    } else {
+      Object.assign(player.value, updated)
+    }
+  }
+
   return {
     player,
     fetchPlayer,
     movePlayer,
+    updatePlayer
   }
 })

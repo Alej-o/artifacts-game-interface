@@ -4,13 +4,21 @@
       <div v-for="(row, yIndex) in mapGrid" :key="yIndex" class="row">
         <div v-for="(tile, xIndex) in row" :key="xIndex" class="tile">
           <img v-if="tile" :src="getMapSkinUrl(tile.skin)" :alt="tile.name" />
+           <
+  <GatherButton
+    v-if="tile?.content?.type === 'resource' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
+    :code="tile.content.code"
+    class="gather-button"
+  />
           <div
             v-if="tile && currentPlayer && tile.x === currentPlayer.x && tile.y === currentPlayer.y"
             class="player-wrapper"
           >
             <p class="player-name">{{ currentPlayer.name }}</p>
             <img :src="getPlayerSkinUrl(currentPlayer.skin)" alt="Player" class="player" />
+           
           </div>
+          
         </div>
       </div>
     </div>
@@ -22,6 +30,7 @@
 import { ref, onMounted, onUnmounted, nextTick, computed, watchEffect } from 'vue'
 import { usePlayer } from '../stores/usePlayer'
 import { useMap } from '../stores/useMap'
+import GatherButton from '../components/GatherButton.vue'
 
 const { player, movePlayer } = usePlayer()
 const { fetchCurrentMap } = useMap()
@@ -259,6 +268,12 @@ onUnmounted(() => {
 .tile img {
   object-fit: cover;
 }
+.gather-button {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+}
 
 .player-wrapper {
   position: absolute;
@@ -295,4 +310,5 @@ onUnmounted(() => {
   font-size: 14px;
   z-index: 9999;
 }
+
 </style>

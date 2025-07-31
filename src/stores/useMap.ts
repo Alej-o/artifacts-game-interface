@@ -31,6 +31,15 @@ export const useMap = defineStore('map', () => {
       console.error('[Erreur fetchCurrentMap]', error)
     }
   }
+function updateMap(newMap: typeof currentMap.value) {
+  if (newMap) {
+    currentMap.value = newMap
+  }
+}
 
-  return { currentMap, fetchCurrentMap }
+  return { 
+    currentMap, 
+    fetchCurrentMap,
+    updateMap
+  }
 })
