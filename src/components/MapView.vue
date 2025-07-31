@@ -4,6 +4,10 @@
       <div v-for="(row, yIndex) in mapGrid" :key="yIndex" class="row">
         <div v-for="(tile, xIndex) in row" :key="xIndex" class="tile">
           <img v-if="tile" :src="getMapSkinUrl(tile.skin)" :alt="tile.name" />
+          <FightButton
+  v-if="tile?.content?.type === 'monster' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
+   class="fight-button"
+/>
            <
   <GatherButton
     v-if="tile?.content?.type === 'resource' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
@@ -31,6 +35,8 @@ import { ref, onMounted, onUnmounted, nextTick, computed, watchEffect } from 'vu
 import { usePlayer } from '../stores/usePlayer'
 import { useMap } from '../stores/useMap'
 import GatherButton from '../components/GatherButton.vue'
+import FightButton from '../components/FightButton.vue'
+
 
 const { player, movePlayer } = usePlayer()
 const { fetchCurrentMap } = useMap()
@@ -269,6 +275,12 @@ onUnmounted(() => {
   object-fit: cover;
 }
 .gather-button {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+}
+.fight-button {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
