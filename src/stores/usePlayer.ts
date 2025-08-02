@@ -1,72 +1,34 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useMap } from './useMap'
+import type { Player } from '../types/Player'
 
 export const usePlayer = defineStore('player', () => {
-  const player = ref<null | {
-    name: string
-    level: number
-    skin: string
-    x: number
-    y: number
-    hp: number
-    max_hp: number
-    xp: number
-    max_xp: number
-    gold: number
-  }>(null)
+const player = ref<null | Player>(null)
 
   const token = import.meta.env.VITE_ARTIFACT_TOKEN
 
-  async function fetchPlayer() {
-    try {
-      const res = await fetch('https://api.artifactsmmo.com/my/characters', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/json',
-        },
-      })
+async function fetchPlayer() {
+  try {
+    const res = await fetch('https://api.artifactsmmo.com/my/characters', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+      },
+    })
 
-      const json = await res.json()
-      const char = json.data?.[0]
+    const json = await res.json()
+    const char = json.data?.[0] as Player | undefined
 
-      if (char) {
-        if (!player.value) {
-          player.value = {
-            name: char.name,
-            level: char.level,
-            skin: char.skin,
-            x: char.x ?? 0,
-            y: char.y ?? 0,
-            hp: char.hp,
-            max_hp: char.max_hp,
-            xp: char.xp,
-            max_xp: char.max_xp,
-            gold: char.gold
-          }
-        } else {
-          Object.assign(player.value, {
-            name: char.name,
-            level: char.level,
-            skin: char.skin,
-            x: char.x ?? 0,
-            y: char.y ?? 0,
-            hp: char.hp,
-            max_hp: char.max_hp,
-            xp: char.xp,
-            max_xp: char.max_xp,
-            gold: char.gold
-          })
-        }
-
-        const mapStore = useMap()
-        mapStore.fetchCurrentMap(player.value.x, player.value.y)
-      }
-    } catch (error) {
-      console.error('[Erreur fetchPlayer]', error)
+    if (char) {
+      player.value = char
+      const mapStore = useMap()
+      mapStore.fetchCurrentMap(char.x, char.y)
     }
+  } catch (error) {
+    console.error('[Erreur fetchPlayer]', error)
   }
-
+}
   async function movePlayer(newX: number, newY: number): Promise<number | null> {
     if (!player.value) return null
 

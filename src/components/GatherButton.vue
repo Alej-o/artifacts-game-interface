@@ -75,7 +75,7 @@ async function gather() {
   position: absolute;
   font-size: 14px;
   padding: 4px 8px;
-  background-color: #3a3f5ede;
+  background-color: #4FA4B8;
   color: #fff;
   border: none;
   border-radius: 4px;
