@@ -28,6 +28,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import StatsModal from "../components/modals/StatsModal.vue"
+import EquipmentModal from "../components/modals/EquipmentModal.vue"
+
 
 const showInventory = ref(false)
 const showEquipment = ref(false)
@@ -40,8 +42,8 @@ function handleKeyDown(e: KeyboardEvent) {
   const key = e.key.toLowerCase()
   if (key === 'i') showInventory.value = true
   if (key === 'e') showEquipment.value = true
-  if (key === 's') showStats.value = true
-  if (key === 'k') showSkills.value = true
+  if (key === 't') showStats.value = true
+  if (key === 'm') showSkills.value = true
   if (key === 'a') showAchievements.value = true
 }
 

@@ -5,15 +5,15 @@
         <div v-for="(tile, xIndex) in row" :key="xIndex" class="tile">
           <img v-if="tile" :src="getMapSkinUrl(tile.skin)" :alt="tile.name" />
           <FightButton
-  v-if="tile?.content?.type === 'monster' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
-   class="fight-button"
-/>
+              v-if="tile?.content?.type === 'monster' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
+               class="fight-button"
+            />
            <
-  <GatherButton
-    v-if="tile?.content?.type === 'resource' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
-    :code="tile.content.code"
-    class="gather-button"
-  />
+        <GatherButton
+       v-if="tile?.content?.type === 'resource' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
+        :code="tile.content.code"
+        class="gather-button"
+           />
           <div
             v-if="tile && currentPlayer && tile.x === currentPlayer.x && tile.y === currentPlayer.y"
             class="player-wrapper"

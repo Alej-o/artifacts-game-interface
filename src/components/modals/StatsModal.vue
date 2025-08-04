@@ -71,9 +71,9 @@ const stats = computed(() => player ?? null)
   z-index: 1000;
 }
 .modal {
-  background: #2f5753;
+  background: #bd6a62;
   color: white;
-  border: 2px solid #3b7d4f;
+  border: 3px solid #52333F;
   padding: 20px;
   border-radius: 8px;
   font-family: sans-serif;
@@ -91,8 +91,8 @@ li {
 }
 button {
   margin-top: 15px;
-  background: #3b7d4f;
-  border: 2px solid white;
+  background: #a94b45;
+  border: 2px solid #52333F;
   padding: 6px 12px;
   cursor: pointer;
   font-weight: bold;

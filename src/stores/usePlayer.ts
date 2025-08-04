@@ -79,11 +79,47 @@ async function fetchPlayer() {
       Object.assign(player.value, updated)
     }
   }
+async function equipItem(code: string, slot: string, quantity = 1) {
+  if (!player.value) return
+  const res = await fetch(`https://api.artifactsmmo.com/my/${player.value.name}/action/equip`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({ code, slot, quantity })
+  })
 
+  const json = await res.json()
+  if (json.data?.character) {
+    updatePlayer(json.data.character)
+  }
+}
+
+async function unequipItem(slot: string, quantity = 1) {
+  if (!player.value) return
+  const res = await fetch(`https://api.artifactsmmo.com/my/${player.value.name}/action/unequip`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({ slot, quantity })
+  })
+
+  const json = await res.json()
+  if (json.data?.character) {
+    updatePlayer(json.data.character)
+  }
+}
   return {
     player,
     fetchPlayer,
     movePlayer,
-    updatePlayer
+    updatePlayer,
+    equipItem,
+    unequipItem
   }
 })
