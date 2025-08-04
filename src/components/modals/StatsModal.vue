@@ -1,7 +1,7 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal">
-      <h2>Player Stats</h2>
+    
 
       <section class="stats-group">
         <h3>❤️ Vital</h3>
@@ -45,7 +45,7 @@
         </ul>
       </section>
 
-      <button @click="$emit('close')">Close</button>
+      <button class="close-btn" @click="$emit('close')">Fermer</button>
     </div>
   </div>
 </template>
@@ -55,7 +55,6 @@ import { usePlayer } from '../../stores/usePlayer'
 import { computed } from 'vue'
 
 defineEmits<{ (e: 'close'): void }>()
-
 const { player } = usePlayer()
 const stats = computed(() => player ?? null)
 </script>
@@ -71,16 +70,21 @@ const stats = computed(() => player ?? null)
   z-index: 1000;
 }
 .modal {
-  background: #bd6a62;
-  color: white;
-  border: 3px solid #52333F;
-  padding: 20px;
-  border-radius: 8px;
-  font-family: sans-serif;
-  min-width: 320px;
-  max-height: 90vh;
+  background: #111d17;
+  color: #f8f8f8;
+  border: 3px solid #344634;
+  padding: 26px 28px 22px 28px;
+  border-radius: 15px;
+  font-family: 'Press Start 2P', 'VT323', monospace, Arial, sans-serif;
+  min-width: 340px;
+  max-width: 90vw;
+  max-height: 92vh;
+  box-shadow: 0 4px 40px #000a;
   overflow-y: auto;
+  position: relative;
 }
+
+
 ul {
   list-style: none;
   padding: 0;
@@ -88,22 +92,44 @@ ul {
 }
 li {
   margin: 5px 0;
-}
-button {
-  margin-top: 15px;
-  background: #a94b45;
-  border: 2px solid #52333F;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 14px;
+  font-size: 15px;
 }
 .stats-group {
-  margin-bottom: 15px;
+  margin-bottom: 18px;
+  background: #16221c;
+  border: 2px solid #344634;
+  border-radius: 7px;
+  padding: 13px 18px 11px 16px;
+  box-shadow: 0 1px 4px #0006 inset;
 }
 .stats-group h3 {
-  font-size: 16px;
-  color: #fce8db;
-  margin-bottom: 5px;
+  font-size: 15px;
+  color: #a8e4c3;
+  margin-bottom: 7px;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 0 #0005;
+}
+strong {
+  color: #dfb897;
+  font-family: inherit;
+}
+
+.close-btn {
+  background: #262f23;
+  border: 2.5px solid #82bc80;
+  color: #fff;
+  font-weight: bold;
+  font-size: 15px;
+  padding: 7px 18px;
+  border-radius: 8px;
+  display: block;
+  margin: 28px auto 0;
+  box-shadow: 0 2px 8px #000a;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .18s;
+}
+.close-btn:hover {
+  background: #364d39;
 }
 </style>

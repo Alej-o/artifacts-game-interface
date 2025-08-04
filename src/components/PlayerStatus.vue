@@ -51,14 +51,14 @@ function getPlayerSkinUrl(skin: string): string {
 </script>
 
 <style scoped>
-/* même style que précédemment */
+
 .player-status {
   position: fixed;
   bottom: 20px;
   left: 26px;
   display: flex;
   flex-direction: column;
-  z-index: 998;
+  z-index: 999;
   transform: scale(1.3);
   transform-origin: bottom left;
 }

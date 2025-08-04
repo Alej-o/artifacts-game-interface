@@ -1,34 +1,60 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal">
-      <div v-if="player" class="equipment-grid">
-        <div
-          v-for="(itemCode, slot) in slots"
-          :key="slot"
-          class="slot"
-          :style="{ gridArea: slot }"
-        >
-          <template v-if="itemCode">
+      <div v-if="player" class="content-layout">
+        
+        <!-- Colonne Équipement -->
+        <div class="equipment-grid">
+          <div
+            v-for="(itemCode, slot) in slots"
+            :key="slot"
+            class="slot"
+            :style="{ gridArea: slot }"
+          >
+            <template v-if="itemCode">
+              <img
+                :src="`https://www.artifactsmmo.com/images/items/${itemCode}.png`"
+                :alt="slot"
+                class="item-icon"
+              />
+              <div class="item-code">{{ itemCode }}</div>
+              <button class="btn-unequip" @click="unequip(slot)">Retirer</button>
+            </template>
+            <template v-else>
+              {{ formatSlot(slot) }}
+              <div class="empty">Empty</div>
+            </template>
+          </div>
+
+          <div class="player" style="grid-area: player">
             <img
-              :src="`https://www.artifactsmmo.com/images/items/${itemCode}.png`"
-              :alt="slot"
-              class="item-icon"
+              :src="`https://www.artifactsmmo.com/images/characters/${player.skin}.png`"
+              alt="Player"
             />
-            <div class="item-code">{{ itemCode }}</div>
-            <button class="btn-unequip" @click="unequip(slot)">Retirer</button>
-          </template>
-          <template v-else>
-            {{ formatSlot(slot) }}
-            <div class="empty">Empty</div>
-          </template>
+          </div>
         </div>
 
-        <div class="player" style="grid-area: player">
-          <img
-            :src="`https://www.artifactsmmo.com/images/characters/${player.skin}.png`"
-            alt="Player"
-          />
+        <!-- Colonne Inventaire -->
+        <div class="inventory-grid">
+          <div
+            v-for="item in player.inventory"
+            :key="item.slot"
+            class="inventory-slot"
+          >
+            <template v-if="item.code">
+              <img
+                :src="`https://www.artifactsmmo.com/images/items/${item.code}.png`"
+                :alt="item.code"
+                class="item-icon"
+              />
+              <span class="quantity">x{{ item.quantity }}</span>
+            </template>
+            <template v-else>
+              <div class="empty">Empty</div>
+            </template>
+          </div>
         </div>
+
       </div>
 
       <button class="close-btn" @click="$emit('close')">Close</button>
@@ -43,6 +69,7 @@ import { usePlayer } from '../../stores/usePlayer'
 defineEmits<{ (e: 'close'): void }>()
 
 const { player, unequipItem } = usePlayer()
+
 const slots = computed(() => {
   const p = player ?? null
   return {
@@ -91,11 +118,18 @@ function formatSlot(slot: string) {
   padding: 20px;
   border-radius: 8px;
   font-family: sans-serif;
-  min-width: 350px;
+  min-width: 700px;
   max-height: 90vh;
   overflow-y: auto;
 }
 
+/* Layout 2 colonnes */
+.content-layout {
+  display: flex;
+  gap: 20px;
+}
+
+/* --- Équipement --- */
 .equipment-grid {
   display: grid;
   grid-template-areas:
@@ -106,11 +140,8 @@ function formatSlot(slot: string) {
     "artifact1 artifact2 artifact3"
     ".        rune       .";
   grid-template-columns: repeat(3, 100px);
-  grid-template-rows: repeat(6, auto);
   gap: 10px;
   justify-content: center;
-  align-items: center;
-  margin-bottom: 1rem;
 }
 
 .slot {
@@ -155,14 +186,40 @@ function formatSlot(slot: string) {
   border-radius: 4px;
 }
 
-.btn-unequip:hover {
-  background: #a94b45;
-}
-
 .player img {
   width: 60px;
   height: auto;
   image-rendering: pixelated;
+}
+
+/* --- Inventaire --- */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 60px);
+  gap: 8px;
+  align-content: start;
+}
+
+.inventory-slot {
+  background: #FFC2A1;
+  border: 2px solid #52333F;
+  border-radius: 4px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.quantity {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1px 3px;
+  border-radius: 3px;
 }
 
 .close-btn {
@@ -173,7 +230,34 @@ function formatSlot(slot: string) {
   font-weight: bold;
   font-size: 14px;
   display: block;
-  margin: 0 auto;
+  margin: 1rem auto 0;
   border-radius: 6px;
 }
 </style>
+
+function formatSlot(slot: string) {
+  return slot.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
+
+
+function guessSlotForItem(code: string): string {
+  if (code.includes('amulet')) return 'amulet'
+  if (code.includes('helmet')) return 'helmet'
+  if (code.includes('armor')) return 'body'
+  if (code.includes('ring')) return code.endsWith('2') ? 'ring2' : 'ring1'
+  if (code.includes('sword') || code.includes('bow') || code.includes('staff')) return 'weapon'
+  if (code.includes('shield')) return 'shield'
+  if (code.includes('boots')) return 'boots'
+  if (code.includes('rune')) return 'rune'
+  if (code.includes('artifact')) return 'artifact1' 
+  return 'weapon'
+}
+
+
+function equip(item: { code: string; quantity: number }) {
+  const slot = guessSlotForItem(item.code)
+  equipItem(item.code, slot, 1)
+}
+function unequip(slot: string) {
+  unequipItem(slot)
+}
