@@ -60,7 +60,7 @@ onBeforeUnmount(() => {
 .player-actions {
   position: fixed;
   bottom: 20px;
-  left: 450px;
+  left: 520px;
   display: flex;
   flex-direction: row;
   gap: 13px;
@@ -70,7 +70,7 @@ onBeforeUnmount(() => {
 
 button {
   background: linear-gradient(120deg, #2a3e2a 90%, #57725e 100%);
-  border: 1.5px solid #435b47; /* Vert olive foncé doux */
+  border: 1.5px solid #435b47; 
   border-radius: 10px;
   padding: 6px;
   cursor: pointer;

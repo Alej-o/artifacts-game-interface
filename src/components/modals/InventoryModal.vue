@@ -43,7 +43,7 @@
         <div class="inventory-area">
           <div class="inventory-header">
             <img src="https://www.artifactsmmo.com/images/items/backpack.png" alt="Inventaire" class="header-icon"/>
-            <span class="inventory-header-title">INVENTAIRE</span>
+            <span class="inventory-header-title">INVENTORY</span>
           </div>
           <div class="inventory-grid">
             <div
