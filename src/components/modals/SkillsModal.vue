@@ -2,6 +2,7 @@
   <Teleport to="body">
     <div class="skills-modal-overlay" @click.self="$emit('close')">
       <div class="skills-modal">
+         <button class="close-btn modal-close-btn" @click="$emit('close')" aria-label="Close">×</button>
         <h2 class="skills-title">SKILLS</h2>
         <div class="skills-list">
           <div
@@ -12,7 +13,7 @@
             <img :src="skill.icon" :alt="skill.name" class="skill-icon" />
             <div class="skill-info">
               <span class="skill-name">{{ skill.name }} </span> 
-              <span class="skill-level">(Level {{ skill.level }})</span>
+              <span class="skill-level">Level {{ skill.level }}</span>
               <span class="skill-xp">
                 : {{ skill.xp }}/{{ skill.maxXp }} XP
               </span>
@@ -25,7 +26,6 @@
             </div>
           </div>
         </div>
-        <button class="skills-close-btn" @click="$emit('close')">Close</button>
       </div>
     </div>
   </Teleport>
@@ -127,7 +127,6 @@ const skills = computed(() => {
 .skills-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
   z-index: 99999;
   display: flex;
   align-items: center;
@@ -135,24 +134,43 @@ const skills = computed(() => {
 }
 
 .skills-modal {
-  background: #111d17;
+  background: #21381B;
+  position:relative;
   padding: 24px 28px;
   border-radius: 12px;
   min-width: 420px;
   max-width: 95vw;
   color: #fff;
-  border: 3px solid #344634;
-  box-shadow: 0 4px 40px #000a;
+  border: 2.5px solid #43633e;
+  box-shadow: 0 4px 40px #000b,0 1px 0 #3c3e2c;
   font-family: 'Press Start 2P', 'VT323', monospace, Arial, sans-serif;
 }
+.modal-close-btn {
+  position: absolute;
+  top: 13px;
+  right: 15px;
+  background: #284a31;
+  border: none;
+  color: #ffe792;
+  border-radius: 50%;
+  font-size: 21px;
+  width: 29px;
+  height: 29px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 10;
+  box-shadow: 0 2px 8px #0004;
+  transition: background 0.14s;
+}
+.modal-close-btn:hover { background: #3cb162; }
 
 .skills-title {
-  font-size: 20px;
-  letter-spacing: 1px;
+  font-size: 19px;
   margin-bottom: 18px;
   font-weight: bold;
-  color: #fff;
-  text-shadow: 1px 1px 0 #344634, 2px 2px 0 #0008;
+  color: #ffe792;
+   letter-spacing: .02em;
+
 }
 
 .skills-list {
@@ -165,7 +183,7 @@ const skills = computed(() => {
   display: flex;
   align-items: center;
   gap: 16px;
-  background: #16221c;
+  background: #223822;
   border-radius: 8px;
   padding: 10px 12px;
   box-shadow: 0 2px 6px #0005;
@@ -188,12 +206,19 @@ const skills = computed(() => {
   font-size: 15px;
   font-family: inherit;
   font-weight: bold;
-  color: #f8f8f8;
+  color: #ffe792;
 }
 
-.skill-level, .skill-xp {
+.skill-level{
+  color: #aaff98;
   font-size: 13px;
-  color: #e7e7e7;
+  margin-left: 3px;
+} 
+
+
+.skill-xp {
+  color: #FFFAC0;
+  font-size: 13px;
   margin-left: 3px;
 }
 
@@ -208,28 +233,18 @@ const skills = computed(() => {
 }
 
 .skill-bar {
-  background: linear-gradient(90deg,#f6e2c0,#b9eee0 70%,#99e6a6 100%);
+ background: linear-gradient(90deg,
+  #ffe792 0%,
+  #fce398 25%,
+  #b7f183 75%,
+  #70e088 100%
+);
+
   height: 100%;
   border-radius: 5px 0 0 5px;
   box-shadow: 0 1px 3px #fff8;
   transition: width 0.3s;
 }
 
-.skills-close-btn {
-  display: block;
-  margin: 25px auto 0;
-  background: #262f23;
-  color: #fff;
-  font-weight: bold;
-  border: 2px solid #82bc80;
-  border-radius: 6px;
-  font-size: 15px;
-  padding: 7px 18px;
-  box-shadow: 0 2px 8px #000a;
-  cursor: pointer;
-  transition: background .2s;
-}
-.skills-close-btn:hover {
-  background: #364d39;
-}
+
 </style>
