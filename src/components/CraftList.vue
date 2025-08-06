@@ -33,7 +33,7 @@ defineEmits(['select', 'close'])
 
 <style scoped>
 .craft-list-modal {
-  background: #1e331d;
+  background: #21381b;
   border-radius: 18px;
   border: 2.5px solid #4a604d;
   min-width: 350px;
@@ -102,16 +102,21 @@ defineEmits(['select', 'close'])
 .item-name { color: #fce398; font-weight: bold; font-size: 15px; flex: 1; }
 .item-lvl { color: #b7f183; font-size: 13px; font-weight: bold; }
 .close-btn {
-  background: #2d422b;
+  position: absolute;
+  top: 19px;
+  right: 15px;
+  background: #284a31;
   border: none;
   color: #ffe792;
   border-radius: 50%;
-  font-size: 23px;
-  width: 29px; height: 29px;
+  font-size: 21px;
+  width: 29px;
+  height: 29px;
   cursor: pointer;
   font-weight: bold;
-  z-index: 2;
-  transition: background 0.12s;
+  z-index: 10;
+  box-shadow: 0 2px 8px #0004;
+  transition: background 0.14s;
 }
 .close-btn:hover { background: #496e3d; }
 </style>

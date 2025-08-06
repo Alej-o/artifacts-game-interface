@@ -183,7 +183,7 @@ async function selectItem(code: string) {
     loadingDetail.value = false
   }
 }
-async function craft(item: any) {
+async function craft(item: any, quantity = 1) {
   if (!player.value?.name) return
   craftingId.value = item.code
   try {
@@ -197,14 +197,12 @@ async function craft(item: any) {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',
         },
-        body: JSON.stringify({ code: item.code, quantity: 1 })
+        body: JSON.stringify({ code: item.code, quantity }) // ICI
       }
     )
     if (!res.ok) throw new Error('Craft failed')
 
-    
-    await playerStore.fetchPlayer() 
-
+    await playerStore.fetchPlayer()
     alert('Item crafted! Inventory updated.')
   } catch (e: any) {
     alert('Error while crafting this item.')
@@ -212,6 +210,7 @@ async function craft(item: any) {
     craftingId.value = null
   }
 }
+
 function onEsc(e: KeyboardEvent) {
   if (e.key === 'Escape') {
     if (detailsOpen.value) closeDetails()

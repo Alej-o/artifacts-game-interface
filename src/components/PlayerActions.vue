@@ -69,7 +69,7 @@ onBeforeUnmount(() => {
 }
 
 button {
-  background: linear-gradient(120deg, #2a3e2a 90%, #57725e 100%);
+  background: #21381B;
   border: 1.5px solid #435b47; 
   border-radius: 10px;
   padding: 6px;
@@ -81,9 +81,7 @@ button {
   align-items: center;
   justify-content: center;
   transition: 
-    border-color 0.18s, 
-    background 0.15s, 
-    box-shadow 0.15s;
+    border-color 0.18s;
   outline: none;
   font-family: 'Press Start 2P', 'VT323', monospace, Arial, sans-serif;
 }
