@@ -201,7 +201,11 @@ async function craft(item: any) {
       }
     )
     if (!res.ok) throw new Error('Craft failed')
-    alert('Item crafted ! (à brancher proprement)')
+
+    
+    await playerStore.fetchPlayer() 
+
+    alert('Item crafted! Inventory updated.')
   } catch (e: any) {
     alert('Error while crafting this item.')
   } finally {
