@@ -14,6 +14,10 @@
         :code="tile.content.code"
         class="gather-button"
            />
+          <CraftButton
+    v-if="tile?.content?.type === 'workshop' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
+    class="craft-button"
+  />
           <div
             v-if="tile && currentPlayer && tile.x === currentPlayer.x && tile.y === currentPlayer.y"
             class="player-wrapper"
@@ -36,7 +40,7 @@ import { usePlayer } from '../stores/usePlayer'
 import { useMap } from '../stores/useMap'
 import GatherButton from '../components/GatherButton.vue'
 import FightButton from '../components/FightButton.vue'
-
+import CraftButton from '../components/CraftWorkshop.vue'
 
 const { player, movePlayer } = usePlayer()
 const { fetchCurrentMap } = useMap()
@@ -286,7 +290,12 @@ onUnmounted(() => {
   transform: translateX(-50%);
   z-index: 999;
 }
-
+.craft-button {
+   position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+}
 .player-wrapper {
   position: absolute;
   bottom: 20px;
