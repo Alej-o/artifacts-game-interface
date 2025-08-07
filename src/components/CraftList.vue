@@ -44,6 +44,7 @@ defineEmits(['select', 'close'])
   overflow: hidden;
   display: flex; flex-direction: column;
   margin: 0;
+  
 }
 .craft-list-header {
   display: flex;

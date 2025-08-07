@@ -39,7 +39,7 @@ import { useMap } from '../stores/useMap'
 import { usePlayer } from '../stores/usePlayer'
 import { storeToRefs } from 'pinia'
 import CraftList from './CraftList.vue'
-import ItemDetailModal from '../components/modals/ItemDetailModal.vue'
+import ItemDetailModal from './modals/ItemDetailCraftModal.vue'
 
 const mapStore = useMap()
 const playerStore = usePlayer()
@@ -223,19 +223,21 @@ onUnmounted(() => window.removeEventListener('keydown', onEsc))
 
 <style scoped>
 .craft-btn {
-  background: #246b35;
+  background-color: #4FA4B8;
   color: #ffe792;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  padding: 6px 19px;
-  margin-top: 14px;
+  border-radius: 4px;
   cursor: pointer;
+  
+  font-size: 14px;
+  font-weight: bold;
+  padding: 4px 8px;
+  margin-top: 14px;
   box-shadow: 0 2px 8px #0003;
   transition: background 0.13s;
+  
 }
-.craft-btn:hover { background: #339c53; }
+
 .craft-modal-overlay {
   position: fixed;
   inset: 0;

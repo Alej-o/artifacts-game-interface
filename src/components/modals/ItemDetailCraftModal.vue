@@ -161,6 +161,7 @@ function getConditionStatus(cond: any): 'valid' | 'invalid' {
   flex-direction: column;
   border: 2.5px solid #43633e;
   overflow: hidden;
+  
 }
 
 .item-modal-content {
@@ -220,6 +221,7 @@ function getConditionStatus(cond: any): 'valid' | 'invalid' {
 .details-level {
   color: #9eff7b;
   font-size: 14px;
+  font-weight: bold;
 }
 .details-section {
   margin: 13px 0 0 0;

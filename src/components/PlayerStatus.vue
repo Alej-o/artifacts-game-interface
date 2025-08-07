@@ -1,27 +1,27 @@
 <template>
   <div class="player-status" v-if="currentPlayer">
     <div class="status-container">
-      <div class="character-wrapper">
-        <div class="name-lvl-row">
-          <p class="name-text">{{ player?.name }}</p>
-          <p class="level-text">Lvl {{ player?.level }}</p>
-        </div>
-        <div class="character">
-          <img :src="getPlayerSkinUrl(currentPlayer.skin)" alt="Player" class="player" />
-        </div>
+      <div class="header-row">
+        <p class="name-text">{{ player?.name }}</p>
+        <span class="level-text">Lvl {{ player?.level }}</span>
       </div>
-
-      <div class="stats-section">
-        <div class="hp-bar">
-          <div class="hp-fill" :style="{ width: hpPercentage + '%' }"></div>
-          <p class="bar-text">{{ player?.hp }} / {{ player?.max_hp }} HP</p>
+      <div class="main-row">
+        <div class="character">
+          <img :src="getPlayerSkinUrl(currentPlayer.skin)" alt="Player" class="player-img" />
         </div>
-        <div class="xp-bar">
-          <div class="xp-fill" :style="{ width: xpPercentage + '%' }"></div>
-          <p class="bar-text">{{ player?.xp }} / {{ player?.max_xp }} XP</p>
-        </div>
-        <div class="gold-bar">
-          <p class="bar-text">{{ player?.gold }}</p>
+        <div class="bars-col">
+          <div class="hp-bar">
+            <div class="hp-fill" :style="{ width: hpPercentage + '%' }"></div>
+            <span class="bar-text">{{ player?.hp }} / {{ player?.max_hp }} HP</span>
+          </div>
+          <div class="xp-bar">
+            <div class="xp-fill" :style="{ width: xpPercentage + '%' }"></div>
+            <span class="bar-text">{{ player?.xp }} / {{ player?.max_xp }} XP</span>
+          </div>
+          <div class="gold-bar">
+            <span class="gold-emoji">💰</span>
+            <span class="bar-text">{{ player?.gold }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -61,58 +61,59 @@ function getPlayerSkinUrl(skin: string): string {
 }
 
 .status-container {
-  display: flex;
-  align-items: flex-end;
-  background: #2a3e2a;
-  border-radius: 14px;
+  background: #21381B;
+  border-radius: 12px;
   box-shadow: 0 2px 12px #0005;
-  padding: 13px 20px 13px 13px;
-  border: 2.5px solid var(--color-border);
-}
-
-.character-wrapper {
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-bottom: 8px;
+  border: 2.5px solid #43633e;
+  font-family: 'Press Start 2P', 'VT323', monospace, Arial, sans-serif;
+  min-width: 320px;
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
-.name-lvl-row {
+.header-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 3px;
+  justify-content: left;
 }
 
 .name-text {
   font-size: 15px;
   font-weight: bold;
-  color: var(--color-text-reward, #ffe792);
-  text-align: center;
-  font-family: inherit;
-  background: var(--color-bg-card-success, #152b1b);
+  color: #ffe792;
+  background: #152b1b;
   border-radius: 7px 0 0 7px;
-  margin: 0;
-  padding: 2px 9px 2px 9px;
+  padding: 2px 13px;
   min-width: 56px;
+  letter-spacing: .02em;
 }
 
 .level-text {
   font-size: 15px;
   font-weight: bold;
-  color: var(--color-success, #9eff7b);
-  font-family: inherit;
-  background: var(--color-bg-card-success, #152b1b);
+  color: #9eff7b;
+  background: #152b1b;
   border-radius: 0 7px 7px 0;
-  margin: 0;
-  padding: 2px 9px 2px 9px;
+  padding: 2px 13px;
   letter-spacing: 1px;
 }
 
-.character {
+.main-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 22px;
+}
+
+.character
+{
   width: 64px;
   height: 64px;
-  background: var(--color-bg-main, #121b15);
-  border: 3px solid var(--color-border, #344634);
+  background: #152B1B;
+  border: 2.5px solid #43633e;
   border-radius: 8px;
   box-shadow: 0 2px 6px #0004;
   display: flex;
@@ -121,20 +122,18 @@ function getPlayerSkinUrl(skin: string): string {
   justify-content: flex-start;
   position: relative;
   overflow: hidden;
-  margin-bottom: 3px;
+  margin-bottom: 7px;
 }
 
-.player {
+.player-img {
   width: 100%;
-  margin-top: 10px;
   image-rendering: pixelated;
 }
 
-.stats-section {
+.bars-col {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  margin-left: 5px;
+  gap: 7px;
   min-width: 220px;
 }
 
@@ -143,13 +142,12 @@ function getPlayerSkinUrl(skin: string): string {
   position: relative;
   width: 220px;
   height: 16px;
-  background: var(--color-bg-progress, #232a23);
-  border: 2px solid var(--color-border, #344634);
+  background: #152B1B;
+  border: 2px solid #344634;
   border-radius: 7px;
   overflow: hidden;
   display: flex;
   align-items: center;
-  margin-bottom: 0px;
   box-shadow: 0 1px 3px #0003 inset;
 }
 
@@ -178,7 +176,7 @@ function getPlayerSkinUrl(skin: string): string {
 .bar-text {
   position: relative;
   z-index: 1;
-  color: #fffce8;
+  color: #FFFAC0;
   font-size: 12px;
   font-weight: bold;
   font-family: inherit;
@@ -193,34 +191,29 @@ function getPlayerSkinUrl(skin: string): string {
 .gold-bar {
   width: 112px;
   height: 22px;
-  background: var(--color-bg-card-success, #152b1b);
-  border: 2px solid var(--color-border, #344634);
+  background: #152b1b;
+  border: 2px solid #344634;
   border-radius: 7px;
   box-shadow: 0 1px 3px #0003 inset;
   display: flex;
   align-items: center;
-  gap: 3px;
-  padding-left: 7px;
+  gap: 5px;
+  padding-left: 9px;
   margin-top: 3px;
 }
 
+.gold-emoji {
+  font-size: 17px;
+  filter: drop-shadow(0 1px 1px #0009);
+}
+
 .gold-bar .bar-text {
-  color: var(--color-text-reward, #ffe792);
+  color: #ffe792;
   font-size: 13px;
   font-weight: bold;
   text-align: left;
   letter-spacing: 0.3px;
   margin-left: 3px;
 }
-
-.gold-bar::before {
-  content: "💰";
-  font-size: 17px;
-  margin-right: 3px;
-  filter: drop-shadow(0 1px 1px #0009);
-}
-
-.player, .modal-img {
-  image-rendering: pixelated;
-}
 </style>
+

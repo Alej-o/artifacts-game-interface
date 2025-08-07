@@ -2,7 +2,7 @@
   <button @click="gather" :disabled="loading || cooldown > 0" class="gather-button">
     <span v-if="loading">Gathering...</span>
     <span v-else-if="cooldown > 0">⏳ {{ cooldown }}s</span>
-    <span v-else>⚒️ Gather</span>
+    <span v-else>⚒️ Gathering</span>
   </button>
 </template>
 
@@ -75,8 +75,8 @@ async function gather() {
   position: absolute;
   font-size: 14px;
   padding: 4px 8px;
-  background-color: #4FA4B8;
-  color: #fff;
+background: #246b35;
+   color: #ffe792;
   border: none;
   border-radius: 4px;
   cursor: pointer;

@@ -80,7 +80,7 @@ async function fight() {
   font-size: 14px;
   padding: 4px 8px;
   background-color: #b22222ee;
-  color: white;
+   color: #ffe792;
   border: none;
   border-radius: 4px;
   cursor: pointer;

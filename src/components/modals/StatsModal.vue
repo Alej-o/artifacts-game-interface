@@ -150,8 +150,7 @@ const stats = computed(() => player ?? null)
 .stats-card-body li:last-child { margin-bottom: 0; }
 .stats-card-body strong {
   color: #b7f183;
-  font-weight: 700;
-  
+  font-weight: bold;
 }
 
 .modal-close-btn {

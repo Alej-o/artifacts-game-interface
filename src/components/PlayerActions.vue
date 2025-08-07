@@ -6,10 +6,10 @@
     <button @click="showInventory = true" title="Inventaire (I)">
       <img src="https://www.artifactsmmo.com/images/items/backpack.png" alt="Inventory" />
     </button>
-    <button @click="showSkills = true" title="Skills/Métiers (M)">
+    <button @click="showSkills = true" title="Skills (M)">
       <img src="https://www.artifactsmmo.com/images/items/spruce_fishing_rod.png" alt="Skills" />
     </button>
-    <button @click="showAchievements = true" title="Succès (A)">
+    <button @click="showAchievements = true" title="Achievements (A)">
       <img src="https://www.artifactsmmo.com/images/items/lich_crown.png" alt="Achievements" />
     </button>
 
@@ -59,8 +59,8 @@ onBeforeUnmount(() => {
 <style scoped>
 .player-actions {
   position: fixed;
-  bottom: 20px;
-  left: 520px;
+  bottom: 25px;
+  left: 450px;
   display: flex;
   flex-direction: row;
   gap: 13px;
