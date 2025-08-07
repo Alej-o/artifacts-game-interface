@@ -1,69 +1,65 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal">
-
-      <!-- VITAL -->
+      <button class="close-btn modal-close-btn" @click="$emit('close')" aria-label="Close">×</button>
+      <h2 class="stats-title">STATS</h2>
       <section class="stats-card">
         <div class="stats-card-header">
           <span class="icon">❤️</span>
           <span class="title">Vital</span>
         </div>
         <ul class="stats-card-body">
-          <li><span>Max HP :</span> <strong>{{ stats?.max_hp }}</strong></li>
-          <li><span>Haste :</span> <strong>{{ stats?.haste }}</strong></li>
-          <li><span>Critical Strike :</span> <strong>{{ stats?.critical_strike }}</strong></li>
-          <li><span>Wisdom :</span> <strong>{{ stats?.wisdom }}</strong></li>
-          <li><span>Prospecting :</span> <strong>{{ stats?.prospecting }}</strong></li>
+          <li><span>Max HP:</span> <strong>{{ stats?.max_hp }}</strong></li>
+          <li><span>Haste:</span> <strong>{{ stats?.haste }}</strong></li>
+          <li><span>Critical Strike:</span> <strong>{{ stats?.critical_strike }}</strong></li>
+          <li><span>Wisdom:</span> <strong>{{ stats?.wisdom }}</strong></li>
+          <li><span>Prospecting:</span> <strong>{{ stats?.prospecting }}</strong></li>
         </ul>
       </section>
 
-      <!-- ATTACKS -->
       <section class="stats-card">
         <div class="stats-card-header">
           <span class="icon">⚔️</span>
-          <span class="title">Attacks</span>
+          <span class="title">Attack</span>
         </div>
         <ul class="stats-card-body">
-          <li><span>Fire :</span> <strong>{{ stats?.attack_fire }}</strong></li>
-          <li><span>Earth :</span> <strong>{{ stats?.attack_earth }}</strong></li>
-          <li><span>Water :</span> <strong>{{ stats?.attack_water }}</strong></li>
-          <li><span>Air :</span> <strong>{{ stats?.attack_air }}</strong></li>
+          <li><span>Fire:</span> <strong>{{ stats?.attack_fire }}</strong></li>
+          <li><span>Earth:</span> <strong>{{ stats?.attack_earth }}</strong></li>
+          <li><span>Water:</span> <strong>{{ stats?.attack_water }}</strong></li>
+          <li><span>Air:</span> <strong>{{ stats?.attack_air }}</strong></li>
         </ul>
       </section>
 
-      <!-- DAMAGES -->
       <section class="stats-card">
         <div class="stats-card-header">
           <span class="icon">⚡️</span>
-          <span class="title">Damages</span>
+          <span class="title">Damage</span>
         </div>
         <ul class="stats-card-body">
-          <li><span>Neutral :</span> <strong>{{ stats?.dmg }}</strong></li>
-          <li><span>Fire :</span> <strong>{{ stats?.dmg_fire }}</strong></li>
-          <li><span>Earth :</span> <strong>{{ stats?.dmg_earth }}</strong></li>
-          <li><span>Water :</span> <strong>{{ stats?.dmg_water }}</strong></li>
-          <li><span>Air :</span> <strong>{{ stats?.dmg_air }}</strong></li>
+          <li><span>Neutral:</span> <strong>{{ stats?.dmg }}</strong></li>
+          <li><span>Fire:</span> <strong>{{ stats?.dmg_fire }}</strong></li>
+          <li><span>Earth:</span> <strong>{{ stats?.dmg_earth }}</strong></li>
+          <li><span>Water:</span> <strong>{{ stats?.dmg_water }}</strong></li>
+          <li><span>Air:</span> <strong>{{ stats?.dmg_air }}</strong></li>
         </ul>
       </section>
 
-      <!-- RESISTANCES -->
       <section class="stats-card">
         <div class="stats-card-header">
           <span class="icon">🛡️</span>
           <span class="title">Resistances</span>
         </div>
         <ul class="stats-card-body">
-          <li><span>Fire :</span> <strong>{{ stats?.res_fire }}</strong></li>
-          <li><span>Earth :</span> <strong>{{ stats?.res_earth }}</strong></li>
-          <li><span>Water :</span> <strong>{{ stats?.res_water }}</strong></li>
-          <li><span>Air :</span> <strong>{{ stats?.res_air }}</strong></li>
+          <li><span>Fire:</span> <strong>{{ stats?.res_fire }}</strong></li>
+          <li><span>Earth:</span> <strong>{{ stats?.res_earth }}</strong></li>
+          <li><span>Water:</span> <strong>{{ stats?.res_water }}</strong></li>
+          <li><span>Air:</span> <strong>{{ stats?.res_air }}</strong></li>
         </ul>
       </section>
-
-      <button class="close-btn" @click="$emit('close')">Fermer</button>
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { usePlayer } from '../../stores/usePlayer'
@@ -78,7 +74,6 @@ const stats = computed(() => player ?? null)
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,30 +88,38 @@ const stats = computed(() => player ?? null)
   min-width: 340px;
   max-width: 92vw;
   max-height: 95vh;
-  box-shadow: 0 8px 32px #000b;
+  box-shadow: 0 4px 40px #000b,0 1px 0 #3c3e2c;
   overflow-y: auto;
   position: relative;
+   font-family: 'Press Start 2P', 'VT323', monospace, Arial, sans-serif;
 }
 
 .stats-card {
-  background: #253920;
-  border: 2px solid #344634;
+  background: #223822;
   border-radius: 12px;
   margin-bottom: 17px;
-  box-shadow: 0 1px 7px #0002 inset;
+  box-shadow: 0 2px 6px #0005;
   overflow: hidden;
   padding: 0;
+}
+.stats-title {
+  font-size: 19px;
+  margin-bottom: 18px;
+  font-weight: bold;
+  color: #ffe792;
+   letter-spacing: .02em;
+
 }
 .stats-card-header {
   display: flex;
   align-items: center;
   gap: 9px;
-  background: linear-gradient(90deg, #2d492d 80%, #3d674a 100%);
+  background: #2d492d;
   padding: 11px 16px 9px 14px;
   border-bottom: 1.5px solid #3b5644;
   font-size: 17px;
   font-weight: bold;
-  color: #e7ffd6;
+  color: #ffe792;
   letter-spacing: .04em;
 }
 .stats-card-header .icon {
@@ -141,29 +144,32 @@ const stats = computed(() => player ?? null)
   align-items: center;
   font-size: 15.3px;
   margin-bottom: 7px;
-  color: #e7ffd6;
+  color: #FFFAC0;
   letter-spacing: 0.01em;
 }
 .stats-card-body li:last-child { margin-bottom: 0; }
 .stats-card-body strong {
   color: #b7f183;
   font-weight: 700;
-  font-family: inherit;
+  
 }
-.close-btn {
-  background: #262f23;
-  border: 2.5px solid #82bc80;
-  color: #fff;
-  font-weight: bold;
-  font-size: 15px;
-  padding: 7px 18px;
-  border-radius: 8px;
-  display: block;
-  margin: 28px auto 0;
-  box-shadow: 0 2px 8px #000a;
-  font-family: inherit;
+
+.modal-close-btn {
+  position: absolute;
+  top: 13px;
+  right: 15px;
+  background: #284a31;
+  border: none;
+  color: #ffe792;
+  border-radius: 50%;
+  font-size: 21px;
+  width: 29px;
+  height: 29px;
   cursor: pointer;
-  transition: background .18s;
+  font-weight: bold;
+  z-index: 10;
+  box-shadow: 0 2px 8px #0004;
+  transition: background 0.14s;
 }
-.close-btn:hover { background: #364d39; }
+.modal-close-btn:hover { background: #3cb162; }
 </style>

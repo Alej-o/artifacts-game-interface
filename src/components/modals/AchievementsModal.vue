@@ -1,6 +1,7 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-achievements">
+      
       <div class="achievements-header">
         <span class="achievements-title">ACHIEVEMENTS</span>
         <button class="close-btn" @click="$emit('close')">×</button>
@@ -50,7 +51,7 @@
           </div>
         </div>
         <div v-if="filteredAchievements.length === 0" style="padding: 18px; text-align: center; color: #ccc;">
-          Aucun achievement trouvé.
+          No achievements found.
         </div>
       </div>
     </div>
@@ -115,23 +116,22 @@ function progressPercent(ach: any) {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
 .modal-achievements {
-  background: #121b15;
-  border: 3px solid #344634;
-  color: #fff;
-  border-radius: 13px;
+  background: #21381b;
+  border: 3px solid #43633e;
+  color: #e7ffd6;
+  border-radius: 15px;
   min-width: 450px;
   max-width: 95vw;
   max-height: 90vh;
-  box-shadow: 0 4px 40px #000a;
+  box-shadow: 0 4px 40px #000b, 0 1px 0 #3c3e2c;
   font-family: 'Press Start 2P', 'VT323', monospace, Arial, sans-serif;
-  padding: 22px 24px 16px 24px;
+  padding: 24px 26px 18px 26px;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -143,48 +143,55 @@ function progressPercent(ach: any) {
   margin-bottom: 7px;
 }
 .achievements-title {
-  font-size: 24px;
-  letter-spacing: 1px;
+  font-size: 22px;
+  letter-spacing: .04em;
   font-weight: bold;
-  text-shadow: 1px 1px 0 #344634;
+  color: #ffe792;
+  padding-bottom: 1px;
 }
 .close-btn {
-  background: none;
+  background: #284a31;
   border: none;
-  color: #fff;
-  font-size: 28px;
-  font-family: inherit;
+  color: #ffe792;
+  font-size: 22px;
   cursor: pointer;
-  margin-left: 8px;
-  margin-top: -6px;
-  opacity: 0.73;
-  transition: opacity .15s;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  margin-left: 10px;
+  margin-top: -3px;
+  opacity: 0.82;
+  box-shadow: 0 2px 8px #0004;
+  transition: background .13s, opacity .15s;
+  font-weight: bold;
 }
-.close-btn:hover { opacity: 1; }
+.close-btn:hover { background: #3cb162; opacity: 1; }
 
 .tabs {
   display: flex;
-  gap: 9px;
-  margin-bottom: 10px;
+  gap: 10px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
 }
 .tabs button {
-  font-family: inherit;
-  background: #18271e;
-  color: #f8f8f8;
-  padding: 6px 16px;
+  background: #1a2812;
+  color: #ffe792;
+  padding: 6px 18px;
   border: none;
-  border-radius: 8px;
+  border-radius: 9px;
   font-size: 13px;
   cursor: pointer;
-  letter-spacing: 1px;
+  letter-spacing: .03em;
   font-weight: bold;
-  transition: background .13s;
+  box-shadow: 0 1px 3px #0003;
+  transition: background .13s, color .13s;
+  border: 2px solid transparent;
 }
 .tabs button.active,
 .tabs button:hover {
   background: #70e088;
-  color: #151e16;
+  color: #183016;
+  border: 2px solid #b7f183;
 }
 
 .achievements-list {
@@ -193,55 +200,68 @@ function progressPercent(ach: any) {
   max-height: 55vh;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 16px;
+  padding-right: 10px;
+  padding-left: 8px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 .achievement-card {
-  background: #181f18;
-  border: 2.5px solid #344634;
-  border-radius: 7px;
-  box-shadow: 0 1px 7px #0004;
-  padding: 14px 15px 9px 14px;
-  margin-bottom: 3px;
-  transition: background .14s, border .14s;
+  background: #223822;
+  border-radius: 8px;
+  padding: 10px 12px 10px 19px;
   position: relative;
+  font-size: 14px;
+  color: #e7ffd6;
+  box-shadow: 0 2px 6px #0005;
 }
 .achievement-card.completed {
   border-color: #9eff7b;
-  background: #152b1b;
-  opacity: 0.85;
+  background: #e5ece3ff;
+  opacity: 1;
 }
 .ach-header {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   margin-bottom: 4px;
   font-size: 15px;
+  color: #ffe792;
+  font-weight: bold;
+}
+.ach-completed {
+  color: #9eff7b;
+  font-size: 19px;
+  margin-left: 4px;
+  font-weight: bold;
 }
 .ach-desc {
   font-size: 13px;
-  color: #e7ecd8;
+  color: #fffac0;
   margin-bottom: 5px;
   margin-top: 2px;
+  font-family: 'VT323', 'Press Start 2P', monospace;
 }
 .ach-progress {
   display: flex;
   align-items: center;
-  gap: 13px;
-  margin-bottom: 3px;
+  gap: 14px;
+  margin-bottom: 4px;
   font-size: 13px;
+  color: #a8e4c3;
 }
 .progress-bar-bg {
   flex: 1;
-  height: 8px;
+  height: 10px;
   border-radius: 7px;
-  background: #232a23;
-  box-shadow: 0 1px 2px #0003 inset;
+  background: #232c28;
+  box-shadow: 0 1px 2px #0004 inset;
   overflow: hidden;
-  margin-left: 8px;
+  margin-left: 10px;
 }
 .progress-bar-fg {
   height: 100%;
-  background: linear-gradient(90deg, #9eff7b 60%, #e7e9a7 100%);
+  background: linear-gradient(90deg, #9eff7b 60%, #ffe792 100%);
   border-radius: 7px 0 0 7px;
   transition: width .18s;
 }
@@ -249,12 +269,13 @@ function progressPercent(ach: any) {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-top: 5px;
+  margin-top: 7px;
   font-size: 13px;
 }
 .ach-points {
   color: #fce398;
   font-weight: bold;
+  font-size: 14px;
 }
 .ach-rewards {
   display: flex;
@@ -270,10 +291,6 @@ function progressPercent(ach: any) {
   filter: drop-shadow(0 1px 0 #8f7c47);
   image-rendering: pixelated;
 }
-.ach-completed {
-  color: #9eff7b;
-  font-size: 17px;
-  margin-left: 4px;
-  font-weight: bold;
-}
+
+
 </style>

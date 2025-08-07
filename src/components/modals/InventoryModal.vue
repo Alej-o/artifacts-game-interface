@@ -1,8 +1,9 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal">
+      <button class="close-btn" @click="$emit('close')" aria-label="Close">×</button>
       <div class="modal-content">
-      
+        
         <div class="equipment-grid">
           <div
             v-for="(itemCode, slot) in slots"
@@ -22,27 +23,22 @@
               <img
                 :src="`https://www.artifactsmmo.com/images/items/${itemCode}.png`"
                 :alt="slot"
-                class="item-icon"
+                class="item-icon equipped"
               />
             </template>
             <template v-else>
               <div class="empty">{{ formatSlot(slot) }}</div>
             </template>
           </div>
-
           <div class="player" style="grid-area: player">
-            <img
-              v-if="player?.skin"
-              :src="`https://www.artifactsmmo.com/images/characters/${player.skin}.png`"
-              alt="Player"
-            />
+            <img v-if="player?.skin" :src="`https://www.artifactsmmo.com/images/characters/${player.skin}.png`" alt="Player"/>
           </div>
         </div>
 
         
         <div class="inventory-area">
           <div class="inventory-header">
-            <img src="https://www.artifactsmmo.com/images/items/backpack.png" alt="Inventaire" class="header-icon"/>
+            <img src="https://www.artifactsmmo.com/images/items/backpack.png" alt="Inventory" class="header-icon"/>
             <span class="inventory-header-title">INVENTORY</span>
           </div>
           <div class="inventory-grid">
@@ -74,35 +70,57 @@
           </div>
         </div>
 
+        
         <div v-if="itemInfo" class="item-info-card">
-          <button class="item-info-close" @click="closeItemInfo">✕</button>
+          <button class="close-btn" @click="closeItemInfo" aria-label="Close">×</button>
           <div class="item-info-header">
-            <img :src="`https://www.artifactsmmo.com/images/items/${itemInfo.code}.png`" :alt="itemInfo.name" class="info-icon"/>
             <div>
-              <strong class="info-name">{{ itemInfo.name }}</strong>
-              <div class="info-type">Niveau {{ itemInfo.level }} — {{ itemInfo.type }}</div>
+              <span class="info-name">{{ itemInfo.name }}</span>
+              <div class="info-type">Level {{ itemInfo.level }} — {{ itemInfo.type }}</div>
             </div>
+            <img :src="`https://www.artifactsmmo.com/images/items/${itemInfo.code}.png`" :alt="itemInfo.name" class="info-icon"/>
           </div>
-          <div class="info-desc">{{ itemInfo.description }}</div>
-          <div v-if="itemInfo.effects && itemInfo.effects.length" class="info-effects">
-            <div v-for="effect in itemInfo.effects" :key="effect.code">
-              <span class="effect-code">{{ effect.code }}</span>
-              <span class="effect-value">{{ effect.value > 0 ? '+' : '' }}{{ effect.value }}</span>
-              <span class="effect-desc" v-if="effect.description">({{ effect.description }})</span>
-            </div>
-          </div>
-          <div v-if="itemInfo.craft" class="info-craft">
-            <div>Craft : {{ itemInfo.craft.skill }} (niveau {{ itemInfo.craft.level }})</div>
-            <div v-for="c in itemInfo.craft.items" :key="c.code" class="info-craft-item">
-              <img :src="`https://www.artifactsmmo.com/images/items/${c.code}.png`" :alt="c.code" class="info-craft-icon"/>
-              x{{ c.quantity }}
-            </div>
-          </div>
-          <div v-if="itemInfo.tradeable === false" class="info-tradeable">Non échangeable</div>
-        </div>
-      </div>
 
-      <button class="close-btn" @click="$emit('close')">Fermer</button>
+          <div class="info-section">
+            <div class="info-desc">{{ itemInfo.description }}</div>
+          </div>
+
+          <div v-if="itemInfo.effects?.length" class="info-section">
+            <div class="info-label">Effects:</div>
+            <ul class="info-effects-list">
+              <li v-for="effect in itemInfo.effects" :key="effect.code">
+                <span class="dot"></span>
+                <span class="effect-value" :class="{ heal: effect.code.toLowerCase().includes('heal') }">
+                  {{ effect.value }}
+                </span>
+                <span class="effect-code">
+                  {{
+                    effect.code
+                      .replace(/_/g, ' ')
+                      .replace(/\b\w/g, (l: string) => l.toUpperCase())
+                  }}
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div v-if="itemInfo.craft" class="info-section">
+            <div class="info-label">Required materials:</div>
+            <ul class="craft-list">
+              <li v-for="c in itemInfo.craft.items" :key="c.code">
+                <span class="dot"></span>
+                <img :src="`https://www.artifactsmmo.com/images/items/${c.code}.png`" :alt="c.code" class="craft-icon"/>
+                <span class="craft-name">{{ c.name || c.code.replace('_', ' ') }}</span>
+                <span class="craft-qty">×{{ c.quantity }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div v-if="itemInfo.tradeable === false" class="info-tradeable">Not tradeable</div>
+        </div>
+       
+
+      </div>
     </div>
   </div>
 </template>
@@ -152,11 +170,9 @@ const slots = computed(() => {
   }
 })
 
-
 function formatSlot(slot: string) {
   return slot.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
-
 function guessSlotForItem(code: string): string {
   if (code.includes('amulet')) return 'amulet'
   if (code.includes('helmet')) return 'helmet'
@@ -169,7 +185,6 @@ function guessSlotForItem(code: string): string {
   if (code.includes('artifact')) return 'artifact1'
   return 'weapon'
 }
-
 function equip(item: { code: string; quantity: number }) {
   const slot = guessSlotForItem(item.code)
   equipItem(item.code, slot, 1)
@@ -177,10 +192,8 @@ function equip(item: { code: string; quantity: number }) {
 function unequip(slot: string) {
   unequipItem(slot)
 }
-
 const dragData = ref<{ from: string; code: string | null }>({ from: '', code: null })
 const dragTarget = ref<string | null>(null)
-
 function onDragStart(from: string, code: string | null) {
   dragData.value = { from, code }
 }
@@ -200,35 +213,31 @@ function onDragLeave() {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
-
 .modal {
-  background: #111d17;
+  background: #21381b;
   color: #fff;
-  border: 3px solid #344634;
+  border: 2.5px solid #43633e;
   padding: 24px 28px;
   border-radius: 12px;
   font-family: 'Press Start 2P', 'VT323', monospace, Arial, sans-serif;
   min-width: 650px;
   max-width: 95vw;
   max-height: 90vh;
-  box-shadow: 0 4px 40px #000a;
+  box-shadow: 0 4px 40px #000b, 0 1px 0 #3c3e2c;
   overflow-y: auto;
   position: relative;
 }
-
 .modal-content {
   display: flex;
   gap: 24px;
   min-height: 380px;
   position: relative;
 }
-
 .equipment-grid {
   display: grid;
   grid-template-areas:
@@ -243,14 +252,12 @@ function onDragLeave() {
   gap: 13px;
   min-width: 320px;
 }
-
 .inventory-area {
   display: flex;
   flex-direction: column;
   flex: 1;
   min-width: 320px;
 }
-
 .inventory-header {
   display: flex;
   align-items: center;
@@ -263,33 +270,27 @@ function onDragLeave() {
   height: 32px;
   image-rendering: pixelated;
 }
-
 .inventory-header-title {
   font-family: 'Press Start 2P', 'VT323', monospace, Arial, sans-serif;
-  font-size: 20px;
-  color: #f8f8f8;
-  letter-spacing: 2.5px;
-  text-shadow: 1px 1px 0 #344634, 2px 2px 0 #0008;
+  font-size: 19px;
+  color: #ffe792;
+  letter-spacing: .02em;
   font-weight: bold;
   margin-top: 3px;
 }
-
 .inventory-grid {
   display: grid;
   grid-template-columns: repeat(5, 60px);
   gap: 10px;
   align-content: flex-start;
 }
-
 .slot, .inventory-slot {
-  background: #16221c;
-  border: 3px solid #344634;
+  background: #223822;
   padding: 8px 4px;
   text-align: center;
   font-family: inherit;
   font-size: 13px;
-  border-radius: 7px;
-  color: #f8f8f8;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -298,18 +299,15 @@ function onDragLeave() {
   transition: background .12s, border-color .15s, box-shadow .15s;
   cursor: pointer;
 }
-
 .slot:hover, .inventory-slot:hover {
   background: #1d2e22;
 }
-
 .slot.selected,
 .inventory-slot.selected {
   box-shadow: 0 0 0 3px #70e088, 0 2px 8px #0008;
   border-color: #70e088;
   z-index: 2;
 }
-
 .item-icon {
   width: 32px;
   height: 32px;
@@ -320,31 +318,20 @@ function onDragLeave() {
   border: 2px solid #2a4534;
   box-shadow: 1px 1px 0 #212, 0 2px 6px #0005;
 }
-
 .quantity {
   font-size: 11px;
-  color: #a8e4c3;
+  color: #aaff98;
   font-family: inherit;
 }
-
-.item-code {
-  font-size: 10px;
-  color: #dfb897;
-  margin-top: 3px;
-  font-family: inherit;
-}
-
 .empty {
   opacity: 0.48;
   font-style: italic;
   color: #a8e4c3;
 }
-
 .drag-over {
   outline: 3px dashed #f1d8a2;
   background: #293e2d
 }
-
 .player {
   display: flex;
   align-items: center;
@@ -359,139 +346,209 @@ function onDragLeave() {
   margin: 0 auto;
 }
 .close-btn {
-  background: #262f23;
-  border: 2.5px solid #82bc80;
-  color: #fff;
-  font-weight: bold;
-  font-size: 15px;
-  padding: 7px 18px;
-  border-radius: 8px;
-  display: block;
-  margin: 28px auto 0;
-  box-shadow: 0 2px 8px #000a;
-  font-family: inherit;
+  position: absolute;
+  top: 13px;
+  right: 15px;
+  background: #284a31;
+  border: none;
+  color: #ffe792;
+  border-radius: 50%;
+  font-size: 21px;
+  width: 29px;
+  height: 29px;
   cursor: pointer;
-  transition: background .18s;
+  font-weight: bold;
+  z-index: 10;
+  box-shadow: 0 2px 8px #0004;
+  transition: background 0.14s;
 }
-.close-btn:hover {
-  background: #364d39;
-}
+.close-btn:hover { background: #3cb162; }
 
+/* --- ITEM INFO CARD --- */
 .item-info-card {
   position: absolute;
   right: 18px;
   bottom: 12px;
-  min-width: 240px;
-  max-width: 295px;
-  background: #16221c;
-  border: 3px solid #344634;
-  border-radius: 10px;
-  box-shadow: 0 8px 32px #000c, 0 1px 0 #344634 inset;
-  color: #f8f8f8;
-  padding: 16px 18px 13px 16px;
-  font-family: 'Press Start 2P', 'VT323', monospace, Arial, sans-serif;
-  font-size: 14px;
+  min-width: 255px;
+  max-width: 325px;
+  background: #21381b;
+  border: 2.5px solid #43633e;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px #000b, 0 1px 0 #3c3e2c;
+  color: #e7ffd6;
+  padding: 18px 20px 16px 19px;
+  font-family: inherit;
+  font-size: 15px;
   z-index: 99;
-  animation: fadeIn .15s;
+  animation: fadeIn .14s;
   pointer-events: auto;
   user-select: text;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
 }
-
 .item-info-close {
-  position: absolute;
-  top: 7px;
-  right: 9px;
-  background: none;
+position: absolute;
+  top: 13px;
+  right: 15px;
+  background: #284a31;
   border: none;
-  color: #a8e4c3;
-  font-size: 16px;
+  color: #ffe792;
+  border-radius: 50%;
+  font-size: 21px;
+  width: 29px;
+  height: 29px;
   cursor: pointer;
-  padding: 0;
-  font-family: inherit;
-  opacity: 0.72;
-  transition: opacity 0.13s;
-  z-index: 1;
+  font-weight: bold;
+  z-index: 10;
+  box-shadow: 0 2px 8px #0004;
+  transition: background 0.14s;
 }
-.item-info-close:hover {
-  opacity: 1;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px);}
-  to { opacity: 1; transform: translateY(0);}
-}
+.item-info-close:hover { background: #3cb162; opacity: 1; }
 .item-info-header {
   display: flex;
-  gap: 12px;
   align-items: center;
-  margin-bottom: 8px;
-}
-.info-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 6px;
-  background: #232c28;
-  border: 2px solid #2a4534;
-  image-rendering: pixelated;
-  flex-shrink: 0;
-}
-.info-name {
-  color: #a8e4c3;
-  font-size: 18px;
-  text-shadow: 1px 1px 0 #344634;
-  font-family: inherit;
-}
-.info-type {
-  color: #dfb897;
-  font-size: 13px;
-  margin-top: 1px;
-}
-.info-desc {
-  margin: 9px 0 6px 0;
-  color: #e7ecd8;
-  font-size: 14px;
-}
-.info-effects {
-  margin: 5px 0 3px 0;
-  font-size: 14px;
-}
-.effect-code {
-  color: #a8e4c3;
-  margin-right: 7px;
-  font-weight: bold;
-}
-.effect-value {
-  color: #8ef587;
-  margin-right: 7px;
-}
-.effect-desc {
-  color: #888;
-  font-size: 12px;
-}
-.info-craft {
-  margin: 6px 0 0 0;
-  color: #8bd3a6;
-  font-size: 13px;
-}
-.info-craft-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin: 2px 0 0 12px;
-}
-.info-craft-icon {
-  width: 18px;
-  height: 18px;
-  border-radius: 3px;
-  background: #232c28;
-  border: 1.5px solid #2a4534;
-  image-rendering: pixelated;
-  flex-shrink: 0;
-}
-.info-tradeable {
-  color: #e57373;
-  font-size: 12px;
-  margin-top: 5px;
+  gap: 18px;
+  margin-bottom: 2px;
 }
 
+.info-name {
+  font-size: 18px;
+  color: #ffe792;
+  font-weight: bold;
+  letter-spacing: .02em;
+  margin-bottom: 1px;
+  text-shadow: 1px 1px 0 #344634;
+}
+.info-type {
+  color: #78e782;
+  font-size: 13px;
+  margin-top: 2px;
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+.info-section {
+  margin-top: 8px;
+  margin-bottom: 3px;
+}
+.info-label {
+  font-size: 15px;
+  color: #fffac0;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+.info-desc {
+  color: #fffac0;
+  font-size: 14px;
+  margin-top: 2px;
+  font-family: inherit;
+}
+.info-effects-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+}
+.info-effects-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #b7f183;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+.effect-value.heal {
+  color: #78e782;
+  font-weight: bold;
+  font-size: 15px;
+}
+.effect-value {
+  font-weight: bold;
+  margin-right: 3px;
+}
+.effect-code {
+  color: #ffe792;
+  font-weight: bold;
+  font-size: 14px;
+  margin-left: 3px;
+}
+.effect-desc {
+  color: #a8e4c3;
+  font-size: 12px;
+  margin-left: 4px;
+}
+.craft-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 4px;
+}
+.craft-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #f5e6b7;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+.craft-icon {
+  width: 21px;
+  height: 21px;
+  image-rendering: pixelated;
+  background: #293e2d;
+  border: 2px solid #2a4534;
+   box-shadow: 1px 1px 0 #212, 0 2px 6px #0005;
+  border-radius: 4px;
+}
+.craft-name {
+  color: #ffe792;
+  font-weight: 700;
+}
+.craft-qty {
+  color: #b7f183;
+  font-size: 14px;
+  margin-left: 1px;
+}
+.dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  background: #ffe792;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+.info-tradeable {
+  color: #ea3d4d;
+  font-size: 13px;
+  font-weight: bold;
+  margin-top: 7px;
+}
+.slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  min-width: 50px;
+}
+
+.item-icon {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 4px;
+  image-rendering: pixelated;
+  border-radius: 4px;
+  background: #293e2d;
+  border: 2px solid #2a4534;
+  box-shadow: 1px 1px 0 #212, 0 2px 6px #0005;
+}
+
+.item-icon.equipped {
+  width: 50px;
+  height: 50px;
+  max-width: 96%;
+  max-height: 96%;
+  margin: 0 auto;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  image-rendering: pixelated;
+}
 </style>
