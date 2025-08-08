@@ -6,8 +6,9 @@ Cette interface de jeu a été imaginée et développée sur mesure avec **Vue 3
 Elle a pour objectif de reproduire une expérience immersive inspirée des jeux vidéo rétro, tout en mettant en valeur mes compétences en **développement front-end** et **Vue.js** 
 
 L’ensemble du code, de la structure et des interactions a été pensé spécifiquement pour ce projet.  
-**Ce travail n’est pas destiné à être cloné, réutilisé tel quel, ni reproduit à l’identique.**  
+Ce travail n’est pas destiné à être cloné, réutilisé tel quel, ni reproduit à l’identique. 
 Vous pouvez toutefois vous en inspirer pour créer votre propre version et explorer l’API.
+
 ---
 
 ### Statut
