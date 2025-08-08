@@ -1,41 +1,81 @@
 <template>
-  <div class="map-container" ref="mapContainer" tabindex="0" aria-label="World map">
-    <div v-if="isLoading" class="loading-screen" role="status" aria-live="polite" aria-busy="true">
+  <div
+    id="map"
+    class="map-container"
+    ref="mapContainer"
+    tabindex="0"
+    aria-label="World map"
+  >
+    <div
+      v-if="isLoading"
+      class="loading-screen"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+      aria-label="Loading world map"
+    >
       <h1 class="loading-title">Loading...</h1>
     </div>
 
     <div v-else class="all-maps-grid">
       <div v-for="(row, yIndex) in mapGrid" :key="yIndex" class="row">
-        <div v-for="(tile, xIndex) in row" :key="xIndex" class="tile">
-          <img v-if="tile" :src="getMapSkinUrl(tile.skin)" :alt="`Map tile: ${tile.name}`" />
+        <div
+          v-for="(tile, xIndex) in row"
+          :key="xIndex"
+          class="tile"
+          :style="{ width: tileSize + 'px', height: tileSize + 'px' }"
+        >
+          <img
+            v-if="tile"
+            class="map-skin"
+            :src="getMapSkinUrl(tile.skin)"
+            :alt="`Map tile: ${tile.name}`"
+          />
 
           <FightButton
             v-if="tile?.content?.type === 'monster' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
             class="fight-button"
+            aria-label="Fight monster"
           />
           <GatherButton
             v-if="tile?.content?.type === 'resource' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
             :code="tile.content.code"
             class="gather-button"
+            aria-label="Gather resource"
           />
           <CraftButton
             v-if="tile?.content?.type === 'workshop' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
             class="craft-button"
+            aria-label="Open workshop"
           />
 
           <div
             v-if="tile && currentPlayer && tile.x === currentPlayer.x && tile.y === currentPlayer.y"
             class="player-wrapper"
           >
-            <p class="player-name">{{ currentPlayer.name }}</p>
-            <img :src="getPlayerSkinUrl(currentPlayer.skin)" alt="Player character" class="player" />
+            <p :id="playerNameId" class="player-name">{{ currentPlayer.name }}</p>
+            <img
+              :src="getPlayerSkinUrl(currentPlayer.skin)"
+              alt=""
+              :aria-describedby="playerNameId"
+              class="player"
+            />
           </div>
         </div>
       </div>
     </div>
 
     <div v-if="isMoving" class="cooldown-overlay">Moving...</div>
-    <div v-if="!cd.canAct" class="cd-bar">
+
+    <div
+      v-if="!cd.canAct"
+      class="cd-bar"
+      role="progressbar"
+      aria-label="Action cooldown"
+      :aria-valuemin="0"
+      :aria-valuemax="100"
+      :aria-valuenow="Math.round(cd.progress * 100)"
+    >
       <div class="cd-fill" :style="{ width: (cd.progress * 100) + '%' }"></div>
     </div>
   </div>
@@ -64,6 +104,29 @@ const isMoving = ref(false)
 const isLoading = ref(true)
 const currentPlayer = computed(() => player.value ?? null)
 const mapGrid = ref<(MapTile | null)[][]>([])
+const playerNameId = `player-name-${Math.random().toString(36).slice(2, 8)}`
+
+const tileSize = ref(224)
+function computeTileSize(w: number) {
+  const minW = 1280, maxW = 1920
+  const minTile = 160, maxTile = 224
+  if (w >= maxW) return maxTile
+  if (w <= minW) return minTile
+  const t = (w - minW) / (maxW - minW)
+  return Math.round(minTile + t * (maxTile - minTile))
+}
+function updateTileSize() {
+  tileSize.value = computeTileSize(window.innerWidth)
+}
+let resizeRaf = 0 as unknown as number
+function onResize() {
+  cancelAnimationFrame(resizeRaf)
+  resizeRaf = requestAnimationFrame(() => {
+    const before = tileSize.value
+    updateTileSize()
+    if (tileSize.value !== before) centerCameraOnPlayer()
+  })
+}
 
 let minX = 0
 let minY = 0
@@ -106,6 +169,8 @@ async function fetchAllMaps(): Promise<MapTile[]> {
 async function buildGrid() {
   if (!currentPlayer.value) return
   isLoading.value = true
+  updateTileSize()
+
   const maps = await fetchAllMaps()
 
   const xValues = maps.map(m => m.x)
@@ -137,14 +202,14 @@ function centerCameraOnPlayer() {
   const container = mapContainer.value
   if (!p || !container || !mapGrid.value.length) return
 
-  const tileSize = 224
-  const playerScreenX = (p.x - minX) * tileSize
-  const playerScreenY = (p.y - minY) * tileSize
+  const size = tileSize.value
+  const playerScreenX = (p.x - minX) * size
+  const playerScreenY = (p.y - minY) * size
 
   requestAnimationFrame(() => {
     container.scrollTo({
-      top: playerScreenY - container.clientHeight / 2 + tileSize / 2,
-      left: playerScreenX - container.clientWidth / 2 + tileSize / 2,
+      top: playerScreenY - container.clientHeight / 2 + size / 2,
+      left: playerScreenX - container.clientWidth / 2 + size / 2,
       behavior: 'instant',
     })
   })
@@ -155,17 +220,17 @@ function maybeScrollIfNearEdge() {
   const container = mapContainer.value
   if (!p || !container) return
 
-  const tileSize = 224
+  const size = tileSize.value
   const visibleWidth = container.clientWidth
   const visibleHeight = container.clientHeight
 
-  const playerScreenX = (p.x - minX) * tileSize
-  const playerScreenY = (p.y - minY) * tileSize
+  const playerScreenX = (p.x - minX) * size
+  const playerScreenY = (p.y - minY) * size
 
   const scrollLeft = container.scrollLeft
   const scrollTop = container.scrollTop
 
-  const margin = 150
+  const margin = Math.round(size * 0.7)
   const leftEdge = scrollLeft + margin
   const rightEdge = scrollLeft + visibleWidth - margin
   const topEdge = scrollTop + margin
@@ -177,11 +242,11 @@ function maybeScrollIfNearEdge() {
 
   if (playerScreenX < leftEdge || playerScreenX > rightEdge) {
     shouldScroll = true
-    newScrollX = playerScreenX - visibleWidth / 2 + tileSize / 2
+    newScrollX = playerScreenX - visibleWidth / 2 + size / 2
   }
   if (playerScreenY < topEdge || playerScreenY > bottomEdge) {
     shouldScroll = true
-    newScrollY = playerScreenY - visibleHeight / 2 + tileSize / 2
+    newScrollY = playerScreenY - visibleHeight / 2 + size / 2
   }
 
   if (shouldScroll) {
@@ -223,10 +288,13 @@ watch(() => currentPlayer.value, (p) => {
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyPress)
+  window.addEventListener('resize', onResize, { passive: true })
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyPress)
+  window.removeEventListener('resize', onResize as any)
+  cancelAnimationFrame(resizeRaf)
 })
 </script>
 
@@ -238,6 +306,10 @@ onUnmounted(() => {
   position: relative;
   outline: none;
 }
+.map-container:focus {
+  outline: 3px solid #ffe792;
+  outline-offset: 2px;
+}
 
 .loading-screen {
   position: absolute;
@@ -247,15 +319,20 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
 }
-.loading-title {
-  color: #ffe792;
-  font-size: 2rem;
-}
+.loading-title { color: #ffe792; font-size: 2rem; }
 
 .all-maps-grid { display: flex; flex-direction: column; width: max-content; height: max-content; }
 .row { display: flex; }
-.tile { width: 224px; height: 224px; position: relative; }
-.tile img { object-fit: cover; }
+
+/* UNIQUEMENT l’image de la tuile */
+.tile > img.map-skin {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+}
+.tile { position: relative; }
 
 .gather-button, .fight-button, .craft-button {
   position: absolute;
@@ -265,22 +342,34 @@ onUnmounted(() => {
   z-index: 999;
 }
 
+
 .player-wrapper {
   position: absolute;
-  bottom: 20px;
   left: 50%;
-  transform: translateX(-50%);
+  top: 60%;
+  transform: translate(-50%);
   z-index: 20;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.player { width: 50%; height: auto; }
+
+
+.player {
+  width: 50%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
 .player-name {
   font-size: 14px;
   color: white;
   background-color: rgba(138, 43, 226, 0.8);
   padding: 2px 6px;
   border-radius: 4px;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .cooldown-overlay {
@@ -309,5 +398,10 @@ onUnmounted(() => {
   background:linear-gradient(90deg,#7be36f,#d9ff7a);
   box-shadow:inset 0 0 6px #0004;
   transition:width .2s linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-container { scroll-behavior: auto !important; }
+  .cd-fill { transition: none !important; }
 }
 </style>

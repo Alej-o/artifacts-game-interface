@@ -1,6 +1,27 @@
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 
+  --color-bg-main: #121B15;
+  --color-bg-card: #181f18;
+  --color-bg-card-success: #152b1b;
+  --color-bg-tab: #18271e;
+  --color-border: #344634;
+  --color-text-main: #fff;
+  --color-text-secondary: #e7ecd8;
+  --color-text-points: #fce398;
+  --color-text-reward: #ffe792;
+  --color-progress-bg: #232a23;
+  --color-progress-fg: #9eff7b;
+  --color-progress-fg2: #e7e9a7;
+  --color-tab-active: #70e088;
+  --color-tab-active-text: #151e16;
+  --color-success: #9eff7b;
+  --color-error: #AD2F45;
+  --color-modal-img-bg: #181a16;
+  --color-modal-img-border: #242e23;
+  --color-modal-close-bg: #21251c;
+  --color-modal-close-border: #343b2b;
+  --color-modal-close-hover-bg: #0d140a;
 
 
 
