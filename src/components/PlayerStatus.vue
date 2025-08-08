@@ -73,7 +73,6 @@ function getPlayerSkinUrl(skin: string): string {
   padding-right: 12px;
   padding-bottom: 8px;
   border: 2.5px solid #43633e;
-  font-family: 'Press Start 2P', 'VT323', monospace, Arial, sans-serif;
   min-width: 320px;
   display: flex;
   flex-direction: column;
