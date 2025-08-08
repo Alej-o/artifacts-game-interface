@@ -1,21 +1,23 @@
 <template>
-  <div ref="mapContainer" class="map-container">
-    <div class="all-maps-grid">
+  <div class="map-container" ref="mapContainer" tabindex="0" aria-label="World map">
+    <div v-if="isLoading" class="loading-screen" role="status" aria-live="polite" aria-busy="true">
+      <h1 class="loading-title">Loading...</h1>
+    </div>
+
+    <div v-else class="all-maps-grid">
       <div v-for="(row, yIndex) in mapGrid" :key="yIndex" class="row">
         <div v-for="(tile, xIndex) in row" :key="xIndex" class="tile">
-          <img v-if="tile" :src="getMapSkinUrl(tile.skin)" :alt="tile.name" />
+          <img v-if="tile" :src="getMapSkinUrl(tile.skin)" :alt="`Map tile: ${tile.name}`" />
 
           <FightButton
             v-if="tile?.content?.type === 'monster' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
             class="fight-button"
           />
-
           <GatherButton
             v-if="tile?.content?.type === 'resource' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
             :code="tile.content.code"
             class="gather-button"
           />
-
           <CraftButton
             v-if="tile?.content?.type === 'workshop' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
             class="craft-button"
@@ -26,29 +28,30 @@
             class="player-wrapper"
           >
             <p class="player-name">{{ currentPlayer.name }}</p>
-            <img :src="getPlayerSkinUrl(currentPlayer.skin)" alt="Player" class="player" />
+            <img :src="getPlayerSkinUrl(currentPlayer.skin)" alt="Player character" class="player" />
           </div>
         </div>
       </div>
     </div>
+
     <div v-if="isMoving" class="cooldown-overlay">Moving...</div>
     <div v-if="!cd.canAct" class="cd-bar">
-  <div class="cd-fill" :style="{ width: (cd.progress * 100) + '%' }"></div>
-</div>
+      <div class="cd-fill" :style="{ width: (cd.progress * 100) + '%' }"></div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick, computed, watchEffect } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { usePlayer } from '../stores/usePlayer'
 import { useMap } from '../stores/useMap'
 import { useCooldown } from '../stores/useCooldown'
-
 import GatherButton from '../components/GatherButton.vue'
 import FightButton from '../components/FightButton.vue'
 import CraftButton from '../components/CraftWorkshop.vue'
 
+const emit = defineEmits<{ (e: 'ready'): void }>()
 const cd = useCooldown()
 
 const playerStore = usePlayer()
@@ -58,6 +61,7 @@ const { fetchCurrentMap } = useMap()
 
 const mapContainer = ref<HTMLDivElement | null>(null)
 const isMoving = ref(false)
+const isLoading = ref(true)
 const currentPlayer = computed(() => player.value ?? null)
 const mapGrid = ref<(MapTile | null)[][]>([])
 
@@ -101,6 +105,7 @@ async function fetchAllMaps(): Promise<MapTile[]> {
 
 async function buildGrid() {
   if (!currentPlayer.value) return
+  isLoading.value = true
   const maps = await fetchAllMaps()
 
   const xValues = maps.map(m => m.x)
@@ -123,6 +128,8 @@ async function buildGrid() {
   mapGrid.value = grid
   await nextTick()
   centerCameraOnPlayer()
+  isLoading.value = false
+  emit('ready')
 }
 
 function centerCameraOnPlayer() {
@@ -134,10 +141,12 @@ function centerCameraOnPlayer() {
   const playerScreenX = (p.x - minX) * tileSize
   const playerScreenY = (p.y - minY) * tileSize
 
-  container.scrollTo({
-    top: playerScreenY - container.clientHeight / 2 + tileSize / 2,
-    left: playerScreenX - container.clientWidth / 2 + tileSize / 2,
-    behavior: 'instant',
+  requestAnimationFrame(() => {
+    container.scrollTo({
+      top: playerScreenY - container.clientHeight / 2 + tileSize / 2,
+      left: playerScreenX - container.clientWidth / 2 + tileSize / 2,
+      behavior: 'instant',
+    })
   })
 }
 
@@ -199,24 +208,21 @@ async function handleKeyPress(event: KeyboardEvent) {
   }
 
   isMoving.value = true
-  await movePlayer(newX, newY)    
+  await movePlayer(newX, newY)
   maybeScrollIfNearEdge()
   isMoving.value = false
 }
 
-watchEffect(() => {
-  if (currentPlayer.value) {
-    fetchCurrentMap(currentPlayer.value.x, currentPlayer.value.y)
-  }
-})
+watch(() => currentPlayer.value?.name, async (n) => {
+  if (n) await buildGrid()
+}, { immediate: true })
+
+watch(() => currentPlayer.value, (p) => {
+  if (p) fetchCurrentMap(p.x, p.y)
+}, { immediate: true })
 
 onMounted(() => {
-  buildGrid()
   window.addEventListener('keydown', handleKeyPress)
-  if (mapContainer.value) {
-    mapContainer.value.setAttribute('tabindex', '0')
-    mapContainer.value.focus()
-  }
 })
 
 onUnmounted(() => {
@@ -231,6 +237,19 @@ onUnmounted(() => {
   overflow: hidden;
   position: relative;
   outline: none;
+}
+
+.loading-screen {
+  position: absolute;
+  inset: 0;
+  background-color: #1b3b1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loading-title {
+  color: #ffe792;
+  font-size: 2rem;
 }
 
 .all-maps-grid { display: flex; flex-direction: column; width: max-content; height: max-content; }
@@ -289,7 +308,6 @@ onUnmounted(() => {
   height:100%; width:0%;
   background:linear-gradient(90deg,#7be36f,#d9ff7a);
   box-shadow:inset 0 0 6px #0004;
-  transition:width .2s linear;   
+  transition:width .2s linear;
 }
-
 </style>
