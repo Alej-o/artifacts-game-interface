@@ -4,50 +4,61 @@
       <div v-for="(row, yIndex) in mapGrid" :key="yIndex" class="row">
         <div v-for="(tile, xIndex) in row" :key="xIndex" class="tile">
           <img v-if="tile" :src="getMapSkinUrl(tile.skin)" :alt="tile.name" />
+
           <FightButton
-              v-if="tile?.content?.type === 'monster' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
-               class="fight-button"
-            />
-           <
-        <GatherButton
-       v-if="tile?.content?.type === 'resource' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
-        :code="tile.content.code"
-        class="gather-button"
-           />
+            v-if="tile?.content?.type === 'monster' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
+            class="fight-button"
+          />
+
+          <GatherButton
+            v-if="tile?.content?.type === 'resource' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
+            :code="tile.content.code"
+            class="gather-button"
+          />
+
           <CraftButton
-    v-if="tile?.content?.type === 'workshop' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
-    class="craft-button"
-  />
+            v-if="tile?.content?.type === 'workshop' && tile.x === currentPlayer?.x && tile.y === currentPlayer?.y"
+            class="craft-button"
+          />
+
           <div
             v-if="tile && currentPlayer && tile.x === currentPlayer.x && tile.y === currentPlayer.y"
             class="player-wrapper"
           >
             <p class="player-name">{{ currentPlayer.name }}</p>
             <img :src="getPlayerSkinUrl(currentPlayer.skin)" alt="Player" class="player" />
-           
           </div>
-          
         </div>
       </div>
     </div>
-    <div v-if="isMoving" class="cooldown-overlay">Déplacement en cours...</div>
+    <div v-if="isMoving" class="cooldown-overlay">Moving...</div>
+    <div v-if="!cd.canAct" class="cd-bar">
+  <div class="cd-fill" :style="{ width: (cd.progress * 100) + '%' }"></div>
+</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick, computed, watchEffect } from 'vue'
+import { storeToRefs } from 'pinia'
 import { usePlayer } from '../stores/usePlayer'
 import { useMap } from '../stores/useMap'
+import { useCooldown } from '../stores/useCooldown'
+
 import GatherButton from '../components/GatherButton.vue'
 import FightButton from '../components/FightButton.vue'
 import CraftButton from '../components/CraftWorkshop.vue'
 
-const { player, movePlayer } = usePlayer()
+const cd = useCooldown()
+
+const playerStore = usePlayer()
+const { player } = storeToRefs(playerStore)
+const { movePlayer } = playerStore
 const { fetchCurrentMap } = useMap()
 
 const mapContainer = ref<HTMLDivElement | null>(null)
 const isMoving = ref(false)
-const currentPlayer = computed(() => player ?? null)
+const currentPlayer = computed(() => player.value ?? null)
 const mapGrid = ref<(MapTile | null)[][]>([])
 
 let minX = 0
@@ -61,11 +72,10 @@ interface MapTile {
   content: any
 }
 
-function getMapSkinUrl(skin: string): string {
+function getMapSkinUrl(skin: string) {
   return `https://www.artifactsmmo.com/images/maps/${skin}.png`
 }
-
-function getPlayerSkinUrl(skin: string): string {
+function getPlayerSkinUrl(skin: string) {
   return `https://www.artifactsmmo.com/images/characters/${skin}.png`
 }
 
@@ -74,36 +84,27 @@ async function fetchAllMaps(): Promise<MapTile[]> {
   let page = 1
   const pageSize = 50
   let hasMore = true
-
   while (hasMore) {
-    const res = await fetch(
-      `https://api.artifactsmmo.com/maps?page=${page}&size=${pageSize}`,
-      {
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_ARTIFACT_TOKEN}`,
-          Accept: 'application/json',
-        },
-      }
-    )
+    const res = await fetch(`https://api.artifactsmmo.com/maps?page=${page}&size=${pageSize}`, {
+      headers: {
+        Authorization: `Bearer ${import.meta.env.VITE_ARTIFACT_TOKEN}`,
+        Accept: 'application/json',
+      },
+    })
     const json = await res.json()
     allMaps.push(...json.data)
     hasMore = page < json.pages
     page++
   }
-
   return allMaps
 }
 
 async function buildGrid() {
-  if (!currentPlayer.value) {
-    console.warn('Player not loaded yet, cannot build grid')
-    return
-  }
-
+  if (!currentPlayer.value) return
   const maps = await fetchAllMaps()
 
-  const xValues = maps.map((m) => m.x)
-  const yValues = maps.map((m) => m.y)
+  const xValues = maps.map(m => m.x)
+  const yValues = maps.map(m => m.y)
   minX = Math.min(...xValues)
   minY = Math.min(...yValues)
 
@@ -113,7 +114,6 @@ async function buildGrid() {
   const grid: (MapTile | null)[][] = Array.from({ length: height }, () =>
     Array(width).fill(null)
   )
-
   for (const tile of maps) {
     const y = tile.y - minY
     const x = tile.x - minX
@@ -126,13 +126,13 @@ async function buildGrid() {
 }
 
 function centerCameraOnPlayer() {
-  const playerData = currentPlayer.value
+  const p = currentPlayer.value
   const container = mapContainer.value
-  if (!playerData || !container || !mapGrid.value.length) return
+  if (!p || !container || !mapGrid.value.length) return
 
   const tileSize = 224
-  const playerScreenX = (playerData.x - minX) * tileSize
-  const playerScreenY = (playerData.y - minY) * tileSize
+  const playerScreenX = (p.x - minX) * tileSize
+  const playerScreenY = (p.y - minY) * tileSize
 
   container.scrollTo({
     top: playerScreenY - container.clientHeight / 2 + tileSize / 2,
@@ -142,22 +142,21 @@ function centerCameraOnPlayer() {
 }
 
 function maybeScrollIfNearEdge() {
-  const playerData = currentPlayer.value
+  const p = currentPlayer.value
   const container = mapContainer.value
-  if (!playerData || !container) return
+  if (!p || !container) return
 
   const tileSize = 224
   const visibleWidth = container.clientWidth
   const visibleHeight = container.clientHeight
 
-  const playerScreenX = (playerData.x - minX) * tileSize
-  const playerScreenY = (playerData.y - minY) * tileSize
+  const playerScreenX = (p.x - minX) * tileSize
+  const playerScreenY = (p.y - minY) * tileSize
 
   const scrollLeft = container.scrollLeft
   const scrollTop = container.scrollTop
 
   const margin = 150
-
   const leftEdge = scrollLeft + margin
   const rightEdge = scrollLeft + visibleWidth - margin
   const topEdge = scrollTop + margin
@@ -171,56 +170,39 @@ function maybeScrollIfNearEdge() {
     shouldScroll = true
     newScrollX = playerScreenX - visibleWidth / 2 + tileSize / 2
   }
-
   if (playerScreenY < topEdge || playerScreenY > bottomEdge) {
     shouldScroll = true
     newScrollY = playerScreenY - visibleHeight / 2 + tileSize / 2
   }
 
   if (shouldScroll) {
-    container.scrollTo({
-      top: newScrollY,
-      left: newScrollX,
-      behavior: 'smooth',
-    })
+    container.scrollTo({ top: newScrollY, left: newScrollX, behavior: 'smooth' })
   }
 }
 
 async function handleKeyPress(event: KeyboardEvent) {
-  if (isMoving.value || !currentPlayer.value) return
+  if (isMoving.value || !currentPlayer.value || !cd.canAct) return
 
   let newX = currentPlayer.value.x
   let newY = currentPlayer.value.y
 
   switch (event.key) {
     case 'ArrowUp':
-    case 'z':
-      newY -= 1
-      break
+    case 'z': newY -= 1; break
     case 'ArrowDown':
-    case 's':
-      newY += 1
-      break
+    case 's': newY += 1; break
     case 'ArrowLeft':
-    case 'q':
-      newX -= 1
-      break
+    case 'q': newX -= 1; break
     case 'ArrowRight':
-    case 'd':
-      newX += 1
-      break
-    default:
-      return
+    case 'd': newX += 1; break
+    default: return
   }
 
   isMoving.value = true
-  const cooldown = await movePlayer(newX, newY)
+  await movePlayer(newX, newY)    
   maybeScrollIfNearEdge()
-  setTimeout(() => {
-    isMoving.value = false
-  }, (cooldown ?? 5) * 1000)
+  isMoving.value = false
 }
-
 
 watchEffect(() => {
   if (currentPlayer.value) {
@@ -231,7 +213,6 @@ watchEffect(() => {
 onMounted(() => {
   buildGrid()
   window.addEventListener('keydown', handleKeyPress)
-
   if (mapContainer.value) {
     mapContainer.value.setAttribute('tabindex', '0')
     mapContainer.value.focus()
@@ -243,9 +224,6 @@ onUnmounted(() => {
 })
 </script>
 
-
-
-
 <style scoped>
 .map-container {
   width: 100vw;
@@ -255,47 +233,19 @@ onUnmounted(() => {
   outline: none;
 }
 
-.all-maps-grid {
-  display: flex;
-  flex-direction: column;
-  width: max-content;
-  height: max-content;
-}
+.all-maps-grid { display: flex; flex-direction: column; width: max-content; height: max-content; }
+.row { display: flex; }
+.tile { width: 224px; height: 224px; position: relative; }
+.tile img { object-fit: cover; }
 
-.row {
-  display: flex;
-}
-
-.tile {
-  width: 224px;
-  height: 224px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.tile img {
-  object-fit: cover;
-}
-.gather-button {
+.gather-button, .fight-button, .craft-button {
   position: absolute;
+  top: 40%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 999;
 }
-.fight-button {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 999;
-}
-.craft-button {
-   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 999;
-}
+
 .player-wrapper {
   position: absolute;
   bottom: 20px;
@@ -304,12 +254,7 @@ onUnmounted(() => {
   z-index: 20;
   text-align: center;
 }
-
-.player {
-  width: 50%;
-  height: auto;
-}
-
+.player { width: 50%; height: auto; }
 .player-name {
   font-size: 14px;
   color: white;
@@ -324,12 +269,27 @@ onUnmounted(() => {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
+  background-color: #21381b;
+  opacity: 0.9;
+  color: #ffe792;
   padding: 8px 12px;
   border-radius: 6px;
   font-size: 14px;
   z-index: 9999;
+}
+
+.cd-bar{
+  position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+  width:180px; height:12px;
+  background:#0f1d0c; border:2px solid #2e5326; border-radius:999px;
+  box-shadow:0 6px 18px #0007, inset 0 1px 2px #0005;
+  overflow:hidden; z-index:9999;
+}
+.cd-fill{
+  height:100%; width:0%;
+  background:linear-gradient(90deg,#7be36f,#d9ff7a);
+  box-shadow:inset 0 0 6px #0004;
+  transition:width .2s linear;   
 }
 
 </style>

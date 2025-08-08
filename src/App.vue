@@ -1,6 +1,6 @@
 <template>
   <main>
-    <div v-if="!store.player">Chargement du joueur...</div>
+    <div v-if="!store.player"></div>
     <MapView v-if="store.player" />
     <PlayerOverlay v-if="store.player" />
   </main>

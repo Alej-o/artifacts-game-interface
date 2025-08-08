@@ -18,9 +18,13 @@
             <div class="xp-fill" :style="{ width: xpPercentage + '%' }"></div>
             <span class="bar-text">{{ player?.xp }} / {{ player?.max_xp }} XP</span>
           </div>
-          <div class="gold-bar">
-            <span class="gold-emoji">💰</span>
-            <span class="bar-text">{{ player?.gold }}</span>
+    
+          <div class="gold-row">
+            <div class="gold-bar">
+              <span class="gold-emoji">💰</span>
+              <span class="bar-text">{{ player?.gold }}</span>
+            </div>
+            <RestButton />
           </div>
         </div>
       </div>
@@ -31,6 +35,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { usePlayer } from '../stores/usePlayer'
+import RestButton from './ResetButton.vue'
 
 const { player } = usePlayer()
 const currentPlayer = computed(() => player ?? null)
@@ -188,8 +193,15 @@ function getPlayerSkinUrl(skin: string): string {
   user-select: none;
 }
 
+.gold-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+  margin-top: 3px;
+}
 .gold-bar {
-  width: 112px;
+  width: 90px;
   height: 22px;
   background: #152b1b;
   border: 2px solid #344634;
@@ -199,14 +211,12 @@ function getPlayerSkinUrl(skin: string): string {
   align-items: center;
   gap: 5px;
   padding-left: 9px;
-  margin-top: 3px;
+  padding-right: 7px;
 }
-
 .gold-emoji {
   font-size: 17px;
   filter: drop-shadow(0 1px 1px #0009);
 }
-
 .gold-bar .bar-text {
   color: #ffe792;
   font-size: 13px;

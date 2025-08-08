@@ -3,7 +3,16 @@ export interface InventoryItem {
   code: string
   quantity: number
 }
-
+export interface Resource {
+  type: 'resource'
+  code: string
+  skill: string
+  level: number
+  conditions?: Array<{ code: string; value: number }>
+  xp_per_action?: number
+  respawn_time?: number
+  drops?: Array<{ code: string; rate: number; min_quantity: number }>
+}
 export interface Player {
   name: string
   account: string

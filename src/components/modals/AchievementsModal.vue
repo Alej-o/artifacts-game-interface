@@ -130,7 +130,6 @@ function progressPercent(ach: any) {
   max-width: 95vw;
   max-height: 90vh;
   box-shadow: 0 4px 40px #000b, 0 1px 0 #3c3e2c;
-  font-family: 'Press Start 2P', 'VT323', monospace, Arial, sans-serif;
   padding: 24px 26px 18px 26px;
   display: flex;
   flex-direction: column;
@@ -248,7 +247,7 @@ function progressPercent(ach: any) {
   gap: 14px;
   margin-bottom: 4px;
   font-size: 13px;
-  color: #a8e4c3;
+  color: #3cb162;
 }
 .progress-bar-bg {
   flex: 1;

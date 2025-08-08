@@ -197,7 +197,7 @@ async function craft(item: any, quantity = 1) {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',
         },
-        body: JSON.stringify({ code: item.code, quantity }) // ICI
+        body: JSON.stringify({ code: item.code, quantity }) 
       }
     )
     if (!res.ok) throw new Error('Craft failed')
@@ -228,7 +228,6 @@ onUnmounted(() => window.removeEventListener('keydown', onEsc))
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  
   font-size: 14px;
   font-weight: bold;
   padding: 4px 8px;

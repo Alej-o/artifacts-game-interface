@@ -545,10 +545,10 @@ position: absolute;
   max-width: 96%;
   max-height: 96%;
   margin: 0 auto;
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
+  background: none ;
+  border: none ;
+  box-shadow: none ;
+  border-radius: 0 ;
   image-rendering: pixelated;
 }
 </style>
