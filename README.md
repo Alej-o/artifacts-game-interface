@@ -20,7 +20,6 @@ Vous pouvez toutefois vous en inspirer pour créer votre propre version et explo
 - Vue 3 (Composition API)
 - TypeScript
 - Pinia (gestion d’état)
-- Tailwind CSS
 - API Artifacts MMO
 - Vite (environnement de build)
 
