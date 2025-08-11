@@ -5,9 +5,9 @@
 Cette interface de jeu a été imaginée et développée sur mesure avec **Vue 3** autour de l’API publique [Artifacts MMO](https://artifactsmmo.com/).  
 Elle a pour objectif de reproduire une expérience immersive inspirée des jeux vidéo rétro, tout en mettant en valeur mes compétences en **développement front-end** et **Vue.js** 
 
-L’ensemble du code, de la structure et des interactions a été pensé spécifiquement pour ce projet.  
-Ce travail n’est pas destiné à être cloné, réutilisé tel quel, ni reproduit à l’identique. 
-Vous pouvez toutefois vous en inspirer pour créer votre propre version et explorer l’API.
+L’ensemble du code, de la structure et des interactions a été conçu sur mesure pour ce projet. 
+Il n’est pas destiné à être réutilisé tel quel ni reproduit à l’identique. 
+Vous pouvez toutefois cloner le dépôt pour explorer l’API et vous en inspirer afin de créer votre propre version.
 
 ---
 
@@ -53,9 +53,9 @@ Vous pouvez toutefois vous en inspirer pour créer votre propre version et explo
 This game interface was custom-designed and developed with Vue 3 around the public Artifacts MMO API.
 It aims to reproduce an immersive, retro-inspired game experience while showcasing my skills in front-end development and vue.js.
 
-Every piece of code, structure, and interaction was specifically crafted for this project.
-This work is not intended to be cloned, reused as-is, or replicated identically.
-However, you’re welcome to draw inspiration from it to build your own version and explore the API.
+All of the code structure and interactions included was tailor-made for this project. 
+It's not intended to be reused as is or reproduced identically. 
+However, you may clone the repository to explore the API and use it as inspiration to create your own version.
 
 ---
 
